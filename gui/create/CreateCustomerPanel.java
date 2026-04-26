@@ -1,4 +1,5 @@
 package gui.create;
+
 import gui.MainFrame;
 import dao.CustomerDAO;
 import model.Customer;
@@ -13,21 +14,28 @@ public class CreateCustomerPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
+        // form panel
         JPanel formPanel = new JPanel(new GridLayout(8,2,10,10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        JLabel firstNameLabel = new JLabel("first name:");
+        // input fields
+        // first name
+        JLabel firstNameLabel = new JLabel("First Name:");
         JTextField firstNameField = new JTextField(15);
 
-        JLabel lastNameLabel = new JLabel("last name:");
+        // last name
+        JLabel lastNameLabel = new JLabel("Last Name:");
         JTextField lastNameField = new JTextField(15);
 
-        JLabel addressLabel = new JLabel("address:");
+        // address
+        JLabel addressLabel = new JLabel("Address:");
         JTextField addressField = new JTextField(15);
 
-        JLabel phoneLabel = new JLabel("phone number:");
+        // phone number
+        JLabel phoneLabel = new JLabel("Phone number:");
         JFormattedTextField phoneField = new JFormattedTextField();
 
+        // phone format mask
         try{
             MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
             phoneFormatter.setPlaceholderCharacter('_');
@@ -36,22 +44,28 @@ public class CreateCustomerPanel extends JPanel {
             ex.printStackTrace();
         }
 
+        // phone field
         phoneField.setColumns(10);
         phoneField.setPreferredSize(new Dimension(120, phoneField.getPreferredSize().height));
         phoneField.setHorizontalAlignment(JTextField.CENTER);
 
-        JLabel usernameLabel = new JLabel("username:");
+        // name
+        JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField(15);
 
-        JLabel emailLabel = new JLabel("email:");
+        // email
+        JLabel emailLabel = new JLabel("Email:");
         JTextField emailField = new JTextField(15);
 
-        JLabel passwordLabel = new JLabel("password:");
+        // password
+        JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField(15);
 
-        JButton backButton = new JButton("back");
-        JButton createButton = new JButton("create");
+        // buttons
+        JButton backButton = new JButton("Back");
+        JButton createButton = new JButton("Create");
 
+        // form layout
         formPanel.add(firstNameLabel);
         formPanel.add(firstNameField);
         formPanel.add(lastNameLabel);
@@ -69,12 +83,15 @@ public class CreateCustomerPanel extends JPanel {
         formPanel.add(backButton);
         formPanel.add(createButton);
 
+        // main layout
         add(formPanel);
 
+        // navigation action
         backButton.addActionListener(e -> {
             mainFrame.showCreateAccountPanel();
         });
 
+        // create account action
         createButton.addActionListener(e -> {
 
             String firstName = firstNameField.getText().trim();
@@ -85,8 +102,9 @@ public class CreateCustomerPanel extends JPanel {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword());
 
+            // check required fields
             if(firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()){
-                JOptionPane.showMessageDialog(this, "please fill required fields.");
+                JOptionPane.showMessageDialog(this, "Please Fill Required Fields.");
                 return;
             }
 
@@ -102,14 +120,15 @@ public class CreateCustomerPanel extends JPanel {
                     password
                 );
 
+                // create new customer
                 new CustomerDAO().insert(customer);
 
-                JOptionPane.showMessageDialog(this, "customer account created.");
+                JOptionPane.showMessageDialog(this, "Customer Account Created.");
                 mainFrame.showLoginPanel();
 
             } catch (Exception ex){
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "error creating customer account.");
+                JOptionPane.showMessageDialog(this, "Error Creating Customer Account.");
             }
         });
     }

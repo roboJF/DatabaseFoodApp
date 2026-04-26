@@ -25,6 +25,7 @@ public class CustomerBrowsePanel extends JPanel {
     private JTable restaurantTable;
     private JTable menuTable;
     private JTable cartTable;
+    private JLabel totalLabel;
 
     private DefaultTableModel restaurantModel;
     private DefaultTableModel menuModel;
@@ -44,27 +45,29 @@ public class CustomerBrowsePanel extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
 
-        restaurantModel = new DefaultTableModel(new String[]{"Restaurant", "Location", "Phone"}, 0) {
+        // table models
+        restaurantModel = new DefaultTableModel(new String[] { "Restaurant", "Location", "Phone" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        menuModel = new DefaultTableModel(new String[]{"Item", "Description", "Price"}, 0) {
+        menuModel = new DefaultTableModel(new String[] { "Item", "Description", "Price" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        cartModel = new DefaultTableModel(new String[]{"Item", "Price", "Quantity", "Subtotal"}, 0) {
+        cartModel = new DefaultTableModel(new String[] { "Item", "Price", "Quantity", "Subtotal" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 2;
             }
         };
 
+        // tables
         restaurantTable = new JTable(restaurantModel);
         menuTable = new JTable(menuModel);
         cartTable = new JTable(cartModel);
@@ -73,14 +76,17 @@ public class CustomerBrowsePanel extends JPanel {
         menuTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         cartTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        // restaurant panel
         JPanel restaurantPanel = new JPanel(new BorderLayout(5, 5));
         restaurantPanel.add(new JLabel("Restaurants"), BorderLayout.NORTH);
         restaurantPanel.add(new JScrollPane(restaurantTable), BorderLayout.CENTER);
 
+        // menu panel
         JPanel menuPanel = new JPanel(new BorderLayout(5, 5));
         menuPanel.add(new JLabel("Menu"), BorderLayout.NORTH);
         menuPanel.add(new JScrollPane(menuTable), BorderLayout.CENTER);
 
+        // add to cart panel
         JPanel addToCartPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         addQuantityField = new JTextField("1", 4);
         JButton addToCartButton = new JButton("Add to Cart");
@@ -91,14 +97,17 @@ public class CustomerBrowsePanel extends JPanel {
 
         menuPanel.add(addToCartPanel, BorderLayout.SOUTH);
 
+        // top browse panel
         JPanel topBrowsePanel = new JPanel(new GridLayout(1, 2, 10, 10));
         topBrowsePanel.add(restaurantPanel);
         topBrowsePanel.add(menuPanel);
 
+        // cart panel
         JPanel cartPanel = new JPanel(new BorderLayout(5, 5));
         cartPanel.add(new JLabel("Cart"), BorderLayout.NORTH);
         cartPanel.add(new JScrollPane(cartTable), BorderLayout.CENTER);
 
+        // cart buttons
         JPanel cartButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton removeButton = new JButton("Remove Selected");
         JButton placeOrderButton = new JButton("Place Order");
@@ -106,13 +115,27 @@ public class CustomerBrowsePanel extends JPanel {
         cartButtonPanel.add(removeButton);
         cartButtonPanel.add(placeOrderButton);
 
-        cartPanel.add(cartButtonPanel, BorderLayout.SOUTH);
+        // cart total
+        totalLabel = new JLabel("Total: $0.00", SwingConstants.RIGHT);
+        totalLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
+        JPanel totalPanel = new JPanel(new BorderLayout());
+        totalPanel.add(totalLabel, BorderLayout.EAST);
+
+        // cart footer
+        JPanel cartFooterPanel = new JPanel(new BorderLayout());
+        cartFooterPanel.add(totalPanel, BorderLayout.NORTH);
+        cartFooterPanel.add(cartButtonPanel, BorderLayout.SOUTH);
+
+        cartPanel.add(cartFooterPanel, BorderLayout.SOUTH);
+
+        // main layout
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topBrowsePanel, cartPanel);
         splitPane.setResizeWeight(0.65);
 
         add(splitPane, BorderLayout.CENTER);
 
+        // restaurant selection
         restaurantTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && restaurantTable.getSelectedRow() != -1) {
                 int row = restaurantTable.getSelectedRow();
@@ -120,13 +143,13 @@ public class CustomerBrowsePanel extends JPanel {
 
                 int newBusinessId = selected.getFoodBusinessId();
 
+                // clear cart if they choose a different restaurant
                 if (!cartItems.isEmpty() && selectedBusinessId != -1 && newBusinessId != selectedBusinessId) {
                     int confirm = JOptionPane.showConfirmDialog(
                             this,
                             "Switching restaurants will clear your cart. Continue?",
                             "Clear Cart?",
-                            JOptionPane.YES_NO_OPTION
-                    );
+                            JOptionPane.YES_NO_OPTION);
 
                     if (confirm != JOptionPane.YES_OPTION) {
                         int oldRow = getRestaurantRowById(selectedBusinessId);
@@ -143,8 +166,10 @@ public class CustomerBrowsePanel extends JPanel {
             }
         });
 
+        // add to cart button
         addToCartButton.addActionListener(e -> addSelectedItemToCart());
 
+        // cart quantity edit
         cartModel.addTableModelListener(e -> {
             if (e.getType() == TableModelEvent.UPDATE &&
                     e.getColumn() == 2 &&
@@ -154,20 +179,23 @@ public class CustomerBrowsePanel extends JPanel {
             }
         });
 
+        // remove item button
         removeButton.addActionListener(e -> removeSelectedCartItem());
 
+        // place order button
         placeOrderButton.addActionListener(e -> placeOrder());
 
         loadRestaurants();
     }
 
+    // load restaurants
     private void loadRestaurants() {
         try {
             restaurantList = new FoodBusinessDAO().getAll();
             restaurantModel.setRowCount(0);
 
             for (FoodBusiness b : restaurantList) {
-                restaurantModel.addRow(new Object[]{
+                restaurantModel.addRow(new Object[] {
                         b.getName(),
                         b.getLocation(),
                         b.getContactInfo()
@@ -180,13 +208,14 @@ public class CustomerBrowsePanel extends JPanel {
         }
     }
 
+    // load menu items
     private void loadMenuItems() {
         try {
             menuItemList = new MenuItemDAO().getAvailableByBusiness(selectedBusinessId);
             menuModel.setRowCount(0);
 
             for (MenuItem item : menuItemList) {
-                menuModel.addRow(new Object[]{
+                menuModel.addRow(new Object[] {
                         item.getName(),
                         item.getDescription(),
                         String.format("$%.2f", item.getPrice())
@@ -199,6 +228,7 @@ public class CustomerBrowsePanel extends JPanel {
         }
     }
 
+    // add item to cart
     private void addSelectedItemToCart() {
         int row = menuTable.getSelectedRow();
 
@@ -243,10 +273,11 @@ public class CustomerBrowsePanel extends JPanel {
         addQuantityField.setText("1");
     }
 
+    // update cart quantity
     private void updateCartQuantity(int row) {
         try {
             int quantity = Integer.parseInt(cartModel.getValueAt(row, 2).toString());
-
+            // verify minimum quantity
             if (quantity < 1) {
                 JOptionPane.showMessageDialog(this, "Quantity must be at least 1.");
                 cartItems.get(row).setQuantity(1);
@@ -262,6 +293,7 @@ public class CustomerBrowsePanel extends JPanel {
         refreshCartTable();
     }
 
+    // remove item from cart
     private void removeSelectedCartItem() {
         int row = cartTable.getSelectedRow();
 
@@ -280,29 +312,38 @@ public class CustomerBrowsePanel extends JPanel {
         }
     }
 
+    // refresh cart table and total
     private void refreshCartTable() {
         cartModel.setRowCount(0);
 
+        double total = 0;
+        // calculate total price
         for (CartItem cartItem : cartItems) {
             MenuItem item = cartItem.getMenuItem();
             int quantity = cartItem.getQuantity();
             double subtotal = item.getPrice() * quantity;
 
-            cartModel.addRow(new Object[]{
+            total += subtotal;
+
+            // format total field
+            cartModel.addRow(new Object[] {
                     item.getName(),
                     String.format("$%.2f", item.getPrice()),
                     quantity,
                     String.format("$%.2f", subtotal)
             });
         }
+
+        totalLabel.setText(String.format("Total: $%.2f", total));
     }
 
+    // place order
     private void placeOrder() {
         if (cartItems.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Your cart is empty.");
             return;
         }
-
+        // add the items to a new pending order
         try {
             FoodOrder order = new FoodOrder("PENDING", customerId, selectedBusinessId);
             int orderId = new FoodOrderDAO().insert(order);
@@ -313,14 +354,14 @@ public class CustomerBrowsePanel extends JPanel {
                 orderItems.add(new OrderItem(
                         cartItem.getQuantity(),
                         orderId,
-                        cartItem.getMenuItem().getMenuItemId()
-                ));
+                        cartItem.getMenuItem().getMenuItemId()));
             }
 
             new OrderItemDAO().insertBatch(orderItems);
 
             JOptionPane.showMessageDialog(this, "Order placed.");
-
+            
+            // reset the cart
             cartItems.clear();
             refreshCartTable();
             selectedBusinessId = -1;
@@ -337,6 +378,7 @@ public class CustomerBrowsePanel extends JPanel {
         }
     }
 
+    // helper to find restaurant row
     private int getRestaurantRowById(int businessId) {
         for (int i = 0; i < restaurantList.size(); i++) {
             if (restaurantList.get(i).getFoodBusinessId() == businessId) {

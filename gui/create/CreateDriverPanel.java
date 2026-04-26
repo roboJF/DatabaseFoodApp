@@ -1,4 +1,5 @@
 package gui.create;
+
 import gui.MainFrame;
 import dao.DeliveryPersonnelDAO;
 import model.DeliveryPersonnel;
@@ -13,18 +14,24 @@ public class CreateDriverPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
+        // form panel
         JPanel formPanel = new JPanel(new GridLayout(8,2,10,10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        JLabel firstNameLabel = new JLabel("first name:");
+        // input fields
+        // first name
+        JLabel firstNameLabel = new JLabel("First Name:");
         JTextField firstNameField = new JTextField(15);
 
-        JLabel lastNameLabel = new JLabel("last name:");
+        // last name
+        JLabel lastNameLabel = new JLabel("Last Name:");
         JTextField lastNameField = new JTextField(15);
 
-        JLabel phoneLabel = new JLabel("phone number:");
+        // phone number
+        JLabel phoneLabel = new JLabel("Phone Number:");
         JFormattedTextField phoneField = new JFormattedTextField();
 
+        // phone format mask
         try{
             MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
             phoneFormatter.setPlaceholderCharacter('_');
@@ -33,25 +40,32 @@ public class CreateDriverPanel extends JPanel {
             ex.printStackTrace();
         }
 
+        // phone field
         phoneField.setColumns(10);
         phoneField.setPreferredSize(new Dimension(120, phoneField.getPreferredSize().height));
         phoneField.setHorizontalAlignment(JTextField.CENTER);
 
-        JLabel vehicleLabel = new JLabel("vehicle details:");
+        // vehicle
+        JLabel vehicleLabel = new JLabel("Vehicle Details:");
         JTextField vehicleField = new JTextField(15);
 
-        JLabel usernameLabel = new JLabel("username:");
+        // username
+        JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField(15);
 
-        JLabel emailLabel = new JLabel("email:");
+        // email
+        JLabel emailLabel = new JLabel("Email:");
         JTextField emailField = new JTextField(15);
 
-        JLabel passwordLabel = new JLabel("password:");
+        // password
+        JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField(15);
 
-        JButton backButton = new JButton("back");
-        JButton createButton = new JButton("create");
+        // buttons
+        JButton backButton = new JButton("Back");
+        JButton createButton = new JButton("Create");
 
+        // form layout
         formPanel.add(firstNameLabel);
         formPanel.add(firstNameField);
         formPanel.add(lastNameLabel);
@@ -69,12 +83,15 @@ public class CreateDriverPanel extends JPanel {
         formPanel.add(backButton);
         formPanel.add(createButton);
 
+        // main layout
         add(formPanel);
 
+        // navigation action
         backButton.addActionListener(e -> {
             mainFrame.showCreateAccountPanel();
         });
 
+        // create account action
         createButton.addActionListener(e -> {
 
             String firstName = firstNameField.getText().trim();
@@ -85,8 +102,9 @@ public class CreateDriverPanel extends JPanel {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword());
 
+            // check required fields
             if(firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()){
-                JOptionPane.showMessageDialog(this, "please fill required fields.");
+                JOptionPane.showMessageDialog(this, "Please Fill Required Fields.");
                 return;
             }
 
@@ -102,14 +120,15 @@ public class CreateDriverPanel extends JPanel {
                     password
                 );
 
+                // create new driver
                 new DeliveryPersonnelDAO().insert(driver);
 
-                JOptionPane.showMessageDialog(this, "driver account created.");
+                JOptionPane.showMessageDialog(this, "Driver Account Created.");
                 mainFrame.showLoginPanel();
 
             } catch (Exception ex){
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "error creating driver account.");
+                JOptionPane.showMessageDialog(this, "Error Creating Driver Account.");
             }
         });
     }

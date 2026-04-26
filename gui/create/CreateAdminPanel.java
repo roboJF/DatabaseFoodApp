@@ -1,4 +1,5 @@
 package gui.create;
+
 import gui.MainFrame;
 import dao.AdministratorDAO;
 import model.Administrator;
@@ -12,21 +13,28 @@ public class CreateAdminPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
+        // form panel
         JPanel formPanel = new JPanel(new GridLayout(4,2,10,10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        JLabel usernameLabel = new JLabel("username:");
+        // input fields
+        // username
+        JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField(15);
 
-        JLabel emailLabel = new JLabel("email:");
+        // email
+        JLabel emailLabel = new JLabel("Email:");
         JTextField emailField = new JTextField(15);
 
-        JLabel passwordLabel = new JLabel("password:");
+        // password
+        JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField(15);
 
-        JButton backButton = new JButton("back");
-        JButton createButton = new JButton("create");
+        // buttons
+        JButton backButton = new JButton("Back");
+        JButton createButton = new JButton("Create");
 
+        // form layout
         formPanel.add(usernameLabel);
         formPanel.add(usernameField);
         formPanel.add(emailLabel);
@@ -36,20 +44,24 @@ public class CreateAdminPanel extends JPanel {
         formPanel.add(backButton);
         formPanel.add(createButton);
 
+        // main layout
         add(formPanel);
 
+        // navigation action
         backButton.addActionListener(e -> {
             mainFrame.showCreateAccountPanel();
         });
 
+        // create account action
         createButton.addActionListener(e -> {
 
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword());
-
+            
+            // check required fields
             if(username.isEmpty() || email.isEmpty() || password.isEmpty()){
-                JOptionPane.showMessageDialog(this, "please fill required fields.");
+                JOptionPane.showMessageDialog(this, "Please Fill Required Fields.");
                 return;
             }
 
@@ -61,14 +73,15 @@ public class CreateAdminPanel extends JPanel {
                     password
                 );
 
+                // create new admin
                 new AdministratorDAO().insert(admin);
 
-                JOptionPane.showMessageDialog(this, "admin account created.");
+                JOptionPane.showMessageDialog(this, "Admin Account Created.");
                 mainFrame.showLoginPanel();
 
             } catch (Exception ex){
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "error creating admin account.");
+                JOptionPane.showMessageDialog(this, "Error Creating Admin Account.");
             }
         });
     }

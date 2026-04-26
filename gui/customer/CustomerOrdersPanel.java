@@ -27,6 +27,7 @@ public class CustomerOrdersPanel extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
 
+        // table model
         ordersModel = new DefaultTableModel(
                 new String[]{"Order ID", "Restaurant", "Status", "Items", "Total"},
                 0
@@ -37,36 +38,47 @@ public class CustomerOrdersPanel extends JPanel {
             }
         };
 
+        // table
         ordersTable = new JTable(ordersModel);
         ordersTable.setRowHeight(24);
 
+        // refresh button
         JButton refreshButton = new JButton("Refresh Orders");
 
+        // top panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(new JLabel("My Orders"), BorderLayout.WEST);
         topPanel.add(refreshButton, BorderLayout.EAST);
 
+        // layout
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(ordersTable), BorderLayout.CENTER);
 
+        // refresh action
         refreshButton.addActionListener(e -> loadOrders());
 
         loadOrders();
     }
 
+    // load orders and populate table
     public void loadOrders() {
         try {
+            // clear table
             ordersModel.setRowCount(0);
 
+            // get all orders for this customer
             List<FoodOrder> orders = new FoodOrderDAO().getByCustomer(customerId);
 
             for (FoodOrder order : orders) {
+
+                // get restaurant and items for order
                 FoodBusiness business = new FoodBusinessDAO().getById(order.getFoodBusinessId());
                 List<OrderItem> orderItems = new OrderItemDAO().getByOrder(order.getFoodOrderId());
 
                 StringBuilder itemsText = new StringBuilder();
                 double total = 0;
 
+                // build item list and calculate total
                 for (OrderItem orderItem : orderItems) {
                     MenuItem menuItem = new MenuItemDAO().getById(orderItem.getMenuItemId());
 
@@ -83,6 +95,7 @@ public class CustomerOrdersPanel extends JPanel {
                     }
                 }
 
+                // add row to table
                 ordersModel.addRow(new Object[]{
                         order.getFoodOrderId(),
                         business != null ? business.getName() : "Unknown",

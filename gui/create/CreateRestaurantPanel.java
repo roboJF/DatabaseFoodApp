@@ -1,4 +1,5 @@
 package gui.create;
+
 import gui.MainFrame;
 import dao.FoodBusinessDAO;
 import model.FoodBusiness;
@@ -13,18 +14,24 @@ public class CreateRestaurantPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
+        // form panel
         JPanel formPanel = new JPanel(new GridLayout(7,2,10,10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        JLabel nameLabel = new JLabel("restaurant name:");
+        // input fields
+        // name
+        JLabel nameLabel = new JLabel("Restaurant Name:");
         JTextField nameField = new JTextField(15);
 
-        JLabel locationLabel = new JLabel("location:");
+        // location
+        JLabel locationLabel = new JLabel("Location:");
         JTextField locationField = new JTextField(15);
 
-        JLabel phoneLabel = new JLabel("phone number:");
+        // phone number
+        JLabel phoneLabel = new JLabel("Phone Number:");
         JFormattedTextField phoneField = new JFormattedTextField();
 
+        // phone format mask
         try{
             MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
             phoneFormatter.setPlaceholderCharacter('_');
@@ -33,22 +40,28 @@ public class CreateRestaurantPanel extends JPanel {
             ex.printStackTrace();
         }
 
+        // phone field
         phoneField.setColumns(10);
         phoneField.setPreferredSize(new Dimension(120, phoneField.getPreferredSize().height));
         phoneField.setHorizontalAlignment(JTextField.CENTER);
 
-        JLabel usernameLabel = new JLabel("username:");
+        // username
+        JLabel usernameLabel = new JLabel("Username:");
         JTextField usernameField = new JTextField(15);
 
-        JLabel emailLabel = new JLabel("email:");
+        // email
+        JLabel emailLabel = new JLabel("Email:");
         JTextField emailField = new JTextField(15);
 
-        JLabel passwordLabel = new JLabel("password:");
+        // pasword
+        JLabel passwordLabel = new JLabel("Password:");
         JPasswordField passwordField = new JPasswordField(15);
 
-        JButton backButton = new JButton("back");
-        JButton createButton = new JButton("create");
+        // buttons
+        JButton backButton = new JButton("Back");
+        JButton createButton = new JButton("Create");
 
+        // form layout
         formPanel.add(nameLabel);
         formPanel.add(nameField);
         formPanel.add(locationLabel);
@@ -64,12 +77,15 @@ public class CreateRestaurantPanel extends JPanel {
         formPanel.add(backButton);
         formPanel.add(createButton);
 
+        // main layout
         add(formPanel);
 
+        // navigation action
         backButton.addActionListener(e -> {
             mainFrame.showCreateAccountPanel();
         });
 
+        // create account action
         createButton.addActionListener(e -> {
 
             String name = nameField.getText().trim();
@@ -79,8 +95,9 @@ public class CreateRestaurantPanel extends JPanel {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword());
 
+            // check required fields
             if(name.isEmpty() || location.isEmpty() || username.isEmpty() || password.isEmpty()){
-                JOptionPane.showMessageDialog(this, "please fill required fields.");
+                JOptionPane.showMessageDialog(this, "Please Fill Required Fields.");
                 return;
             }
 
@@ -95,14 +112,15 @@ public class CreateRestaurantPanel extends JPanel {
                     password
                 );
 
+                // create new restaurant
                 new FoodBusinessDAO().insert(restaurant);
 
-                JOptionPane.showMessageDialog(this, "restaurant account created.");
+                JOptionPane.showMessageDialog(this, "Restaurant Account Created.");
                 mainFrame.showLoginPanel();
 
             } catch (Exception ex){
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "error creating restaurant account.");
+                JOptionPane.showMessageDialog(this, "Error Creating Restaurant Account.");
             }
         });
     }
