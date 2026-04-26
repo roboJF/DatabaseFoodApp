@@ -9,16 +9,17 @@ public class CustomerDAO {
 
     public void insert(Customer customer) throws SQLException {
         String sql = """
-                INSERT INTO customer (name, address, contact_info, username, email, password)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO customer (first_name, last_name, address, contact_info, username, email, password)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-        ps.setString(1, customer.getName());
-        ps.setString(2, customer.getAddress());
-        ps.setString(3, customer.getContactInfo());
-        ps.setString(4, customer.getUsername());
-        ps.setString(5, customer.getEmail());
-        ps.setString(6, customer.getPassword());
+        ps.setString(1, customer.getFirstName());
+        ps.setString(2, customer.getLastName());
+        ps.setString(3, customer.getAddress());
+        ps.setString(4, customer.getContactInfo());
+        ps.setString(5, customer.getUsername());
+        ps.setString(6, customer.getEmail());
+        ps.setString(7, customer.getPassword());
         ps.executeUpdate();
     }
 
@@ -27,7 +28,8 @@ public class CustomerDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, customerId);
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) return mapRow(rs);
+        if (rs.next())
+            return mapRow(rs);
         return null;
     }
 
@@ -36,7 +38,8 @@ public class CustomerDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) return mapRow(rs);
+        if (rs.next())
+            return mapRow(rs);
         return null;
     }
 
@@ -45,24 +48,29 @@ public class CustomerDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         List<Customer> customers = new ArrayList<>();
-        while (rs.next()) customers.add(mapRow(rs));
+        while (rs.next())
+            customers.add(mapRow(rs));
         return customers;
     }
 
     public void update(Customer customer) throws SQLException {
         String sql = """
                 UPDATE customer
-                SET name = ?, address = ?, contact_info = ?, username = ?, email = ?, password = ?
+                SET first_name = ?, last_name = ?, address = ?, contact_info = ?, username = ?, email = ?, password = ?
                 WHERE customer_id = ?
                 """;
+
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-        ps.setString(1, customer.getName());
-        ps.setString(2, customer.getAddress());
-        ps.setString(3, customer.getContactInfo());
-        ps.setString(4, customer.getUsername());
-        ps.setString(5, customer.getEmail());
-        ps.setString(6, customer.getPassword());
-        ps.setInt(7, customer.getCustomerId());
+
+        ps.setString(1, customer.getFirstName());
+        ps.setString(2, customer.getLastName());
+        ps.setString(3, customer.getAddress());
+        ps.setString(4, customer.getContactInfo());
+        ps.setString(5, customer.getUsername());
+        ps.setString(6, customer.getEmail());
+        ps.setString(7, customer.getPassword());
+        ps.setInt(8, customer.getCustomerId());
+
         ps.executeUpdate();
     }
 
@@ -73,16 +81,16 @@ public class CustomerDAO {
         ps.executeUpdate();
     }
 
-    //helper to put a resultset into a customer object
+    // helper to put a resultset into a customer object
     private Customer mapRow(ResultSet rs) throws SQLException {
         return new Customer(
-            rs.getInt("customer_id"),
-            rs.getString("name"),
-            rs.getString("address"),
-            rs.getString("contact_info"),
-            rs.getString("username"),
-            rs.getString("email"),
-            rs.getString("password")
-        );
+                rs.getInt("customer_id"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("address"),
+                rs.getString("contact_info"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password"));
     }
 }

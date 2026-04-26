@@ -1,4 +1,5 @@
-CREATE DATABASE IF NOT EXISTS food_delivery;
+DROP DATABASE IF EXISTS food_delivery;
+CREATE DATABASE food_delivery;
 USE food_delivery;
 
 CREATE TABLE administrator (
@@ -10,7 +11,8 @@ CREATE TABLE administrator (
 
 CREATE TABLE customer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     address VARCHAR(255) NOT NULL,
     contact_info VARCHAR(100),
     username VARCHAR(50)  UNIQUE NOT NULL,
@@ -30,7 +32,8 @@ CREATE TABLE food_business (
 
 CREATE TABLE delivery_personnel (
     delivery_personnel_id  INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     contact_info VARCHAR(100),
     vehicle_details VARCHAR(255),
     username VARCHAR(50)  UNIQUE NOT NULL,
@@ -94,3 +97,4 @@ CREATE TABLE order_item (
     FOREIGN KEY (menu_item_id) REFERENCES menu_item(menu_item_id),
     CONSTRAINT check_quantity CHECK (quantity >= 1)
 );
+

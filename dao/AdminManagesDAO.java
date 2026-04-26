@@ -10,7 +10,7 @@ import java.util.List;
 //i decided to put this all into one DAO since splitting it into 3 seemed pointless
 public class AdminManagesDAO {
 
-    //----------CUSTOMERS----------
+    // ----------CUSTOMERS----------
 
     public void assignAdminToCustomer(int adminId, int customerId) throws SQLException {
         String sql = "INSERT INTO admin_manages_customer (admin_id, customer_id) VALUES (?, ?)";
@@ -40,19 +40,19 @@ public class AdminManagesDAO {
         List<Customer> customers = new ArrayList<>();
         while (rs.next()) {
             customers.add(new Customer(
-                rs.getInt("customer_id"),
-                rs.getString("name"),
-                rs.getString("address"),
-                rs.getString("contact_info"),
-                rs.getString("username"),
-                rs.getString("email"),
-                rs.getString("password")
-            ));
+                    rs.getInt("customer_id"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("address"),
+                    rs.getString("contact_info"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password")));
         }
         return customers;
     }
 
-    //----------FOOD BUSINESSES----------
+    // ----------FOOD BUSINESSES----------
 
     public void assignAdminToBusiness(int adminId, int businessId) throws SQLException {
         String sql = "INSERT INTO admin_manages_business (admin_id, food_business_id) VALUES (?, ?)";
@@ -82,20 +82,19 @@ public class AdminManagesDAO {
         List<FoodBusiness> businesses = new ArrayList<>();
         while (rs.next()) {
             businesses.add(new FoodBusiness(
-                rs.getInt("food_business_id"),
-                rs.getString("name"),
-                rs.getString("location"),
-                rs.getString("contact_info"),
-                rs.getString("username"),
-                rs.getString("email"),
-                rs.getString("password")
-            ));
+                    rs.getInt("food_business_id"),
+                    rs.getString("name"),
+                    rs.getString("location"),
+                    rs.getString("contact_info"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password")));
         }
         return businesses;
     }
 
-    //----------DELIVERY PERSONNEL----------
-    
+    // ----------DELIVERY PERSONNEL----------
+
     public void assignAdminToDelivery(int adminId, int personnelId) throws SQLException {
         String sql = "INSERT INTO admin_manages_delivery (admin_id, delivery_personnel_id) VALUES (?, ?)";
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
@@ -124,14 +123,14 @@ public class AdminManagesDAO {
         List<DeliveryPersonnel> personnel = new ArrayList<>();
         while (rs.next()) {
             personnel.add(new DeliveryPersonnel(
-                rs.getInt("delivery_personnel_id"),
-                rs.getString("name"),
-                rs.getString("contact_info"),
-                rs.getString("vehicle_details"),
-                rs.getString("username"),
-                rs.getString("email"),
-                rs.getString("password")
-            ));
+                    rs.getInt("delivery_personnel_id"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("contact_info"),
+                    rs.getString("vehicle_details"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password")));
         }
         return personnel;
     }

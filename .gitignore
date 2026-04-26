@@ -1,3 +1,23 @@
-lib
-.classpath
+# Compiled Java files
 *.class
+
+# VS Code
+.vscode/
+
+# Eclipse / IDE
+.classpath
+.project
+.settings/
+
+# MySQL Connector (JARs)
+lib/
+*.jar
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
+*.swp
