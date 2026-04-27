@@ -4,13 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 
 import gui.customer.CustomerPanel;
+import gui.restaurant.RestaurantPanel;
 import gui.create.*;
 
 public class MainFrame extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    
+
     public MainFrame() {
         setTitle("Foodie - Your Food Delivery App");
         setSize(900, 600);
@@ -67,7 +68,7 @@ public class MainFrame extends JFrame {
 
     // show restaurant panel
     public void showRestaurantPanel(int restaurantId) {
-        JOptionPane.showMessageDialog(this, "Restaurant panel coming next. ID: " + restaurantId);
+        showPanel("Restaurant", new RestaurantPanel(restaurantId));
     }
 
     // show driver panel
@@ -82,7 +83,6 @@ public class MainFrame extends JFrame {
 
     // helper to switch panels
     private void showPanel(String name, JPanel panel) {
-        mainPanel.remove(panel);
         mainPanel.add(panel, name);
         cardLayout.show(mainPanel, name);
         mainPanel.revalidate();
