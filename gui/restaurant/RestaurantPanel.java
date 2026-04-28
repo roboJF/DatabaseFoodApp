@@ -3,6 +3,7 @@ package gui.restaurant;
 import dao.MenuItemDAO;
 import dao.FoodOrderDAO;
 
+import gui.MainFrame;
 import model.MenuItem;
 import model.FoodOrder;
 
@@ -12,10 +13,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class RestaurantPanel extends JPanel {
 
     private int restaurantId;
+    private MainFrame mainFrame;
 
     private JTable menuTable;
     private JTable orderTable;
@@ -26,10 +27,22 @@ public class RestaurantPanel extends JPanel {
     private List<MenuItem> menuItemList = new ArrayList<>();
     private List<FoodOrder> orderList = new ArrayList<>();
 
-    public RestaurantPanel(int restaurantId) {
+    public RestaurantPanel(int restaurantId, MainFrame mainFrame) {
         this.restaurantId = restaurantId;
+        this.mainFrame = mainFrame;
 
         setLayout(new BorderLayout(10, 10));
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("Restaurant Dashboard");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
+        JButton logoutButton = new JButton("Logout");
+
+        topPanel.add(titleLabel, BorderLayout.WEST);
+        topPanel.add(logoutButton, BorderLayout.EAST);
+
+        add(topPanel, BorderLayout.NORTH);
 
         // menu table
         menuModel = new DefaultTableModel(new String[] { "Item", "Description", "Price", "Available" }, 0) {
@@ -46,7 +59,6 @@ public class RestaurantPanel extends JPanel {
         menuPanel.add(new JLabel("Menu Items"), BorderLayout.NORTH);
         menuPanel.add(new JScrollPane(menuTable), BorderLayout.CENTER);
 
-        // menu buttons
         JPanel menuButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         JButton addMenuItemButton = new JButton("Add Item");
@@ -68,7 +80,10 @@ public class RestaurantPanel extends JPanel {
         menuPanel.add(menuButtonPanel, BorderLayout.SOUTH);
 
         // order table
-        orderModel = new DefaultTableModel(new String[] { "Order ID", "Customer ID", "Status" }, 0) {
+        orderModel = new DefaultTableModel(
+                new String[] { "Order ID", "Customer ID", "Items", "Total Price", "Delivery Driver", "Status" },
+                0
+        ) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -82,7 +97,6 @@ public class RestaurantPanel extends JPanel {
         orderPanel.add(new JLabel("Incoming Orders"), BorderLayout.NORTH);
         orderPanel.add(new JScrollPane(orderTable), BorderLayout.CENTER);
 
-        // order buttons
         JPanel orderButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         JButton pendingButton = new JButton("Mark Pending");
@@ -99,7 +113,6 @@ public class RestaurantPanel extends JPanel {
 
         orderPanel.add(orderButtonPanel, BorderLayout.SOUTH);
 
-        // main layout
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuPanel, orderPanel);
         splitPane.setResizeWeight(0.55);
 
@@ -112,6 +125,11 @@ public class RestaurantPanel extends JPanel {
         availableButton.addActionListener(e -> updateSelectedMenuItemAvailability(true));
         unavailableButton.addActionListener(e -> updateSelectedMenuItemAvailability(false));
         refreshMenuButton.addActionListener(e -> loadMenuItems());
+        editInfoButton.addActionListener(e -> showRestaurantInfo());
+
+        logoutButton.addActionListener(e -> {
+            mainFrame.showLoginPanel();
+        });
 
         // order actions
         pendingButton.addActionListener(e -> updateSelectedOrderStatus("PENDING"));
@@ -119,13 +137,11 @@ public class RestaurantPanel extends JPanel {
         outForDeliveryButton.addActionListener(e -> updateSelectedOrderStatus("OUT_FOR_DELIVERY"));
         completeButton.addActionListener(e -> updateSelectedOrderStatus("COMPLETE"));
         refreshOrdersButton.addActionListener(e -> loadOrders());
-        editInfoButton.addActionListener(e -> showRestaurantInfo());
 
         loadMenuItems();
         loadOrders();
     }
 
-    // load menu items
     private void loadMenuItems() {
         try {
             menuItemList = new MenuItemDAO().getByBusiness(restaurantId);
@@ -146,16 +162,24 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // load orders
     private void loadOrders() {
         try {
             orderList = new FoodOrderDAO().getByBusiness(restaurantId);
             orderModel.setRowCount(0);
 
+            FoodOrderDAO dao = new FoodOrderDAO();
+
             for (FoodOrder order : orderList) {
+                String items = dao.getOrderItemsText(order.getFoodOrderId());
+                double total = dao.getOrderTotal(order.getFoodOrderId());
+                String driver = dao.getDeliveryDriverName(order.getFoodOrderId());
+
                 orderModel.addRow(new Object[] {
                         order.getFoodOrderId(),
                         order.getCustomerId(),
+                        items,
+                        String.format("$%.2f", total),
+                        driver,
                         order.getOrderStatus()
                 });
             }
@@ -166,7 +190,6 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // add menu item
     private void addMenuItem() {
         JTextField nameField = new JTextField();
         JTextField descriptionField = new JTextField();
@@ -217,7 +240,6 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // edit selected menu item
     private void editSelectedMenuItem() {
         int row = menuTable.getSelectedRow();
 
@@ -288,7 +310,6 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // remove selected menu item
     private void removeSelectedMenuItem() {
         int row = menuTable.getSelectedRow();
 
@@ -320,7 +341,6 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // update selected menu item availability
     private void updateSelectedMenuItemAvailability(boolean available) {
         int row = menuTable.getSelectedRow();
 
@@ -341,7 +361,6 @@ public class RestaurantPanel extends JPanel {
         }
     }
 
-    // update selected order status
     private void updateSelectedOrderStatus(String status) {
         int row = orderTable.getSelectedRow();
 
@@ -361,7 +380,7 @@ public class RestaurantPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Error updating order status.");
         }
     }
-    //show restaurant info
+
     private void showRestaurantInfo() {
         JDialog dialog = new JDialog(
                 (JFrame) SwingUtilities.getWindowAncestor(this),

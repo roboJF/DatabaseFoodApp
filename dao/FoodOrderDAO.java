@@ -4,6 +4,7 @@ import model.FoodOrder;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.*;
 
 public class FoodOrderDAO {
 
@@ -122,5 +123,73 @@ public class FoodOrderDAO {
             rs.getInt("food_business_id"),
             personnelId
         );
+    }
+
+    public String getOrderItemsText(int orderId) throws SQLException {
+        String sql = """
+            SELECT mi.name, oi.quantity
+            FROM order_item oi
+            JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+            WHERE oi.food_order_id = ?
+            """;
+
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        ps.setInt(1, orderId);
+
+        ResultSet rs = ps.executeQuery();
+        StringBuilder items = new StringBuilder();
+
+        while (rs.next()) {
+            if (items.length() > 0) {
+                items.append(", ");
+            }
+
+            items.append(rs.getString("name"))
+                    .append(" x")
+                    .append(rs.getInt("quantity"));
+        }
+
+        return items.toString();
+    }
+
+    public double getOrderTotal(int orderId) throws SQLException {
+        String sql = """
+            SELECT SUM(mi.price * oi.quantity) AS total
+            FROM order_item oi
+            JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+            WHERE oi.food_order_id = ?
+            """;
+
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        ps.setInt(1, orderId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getDouble("total");
+        }
+
+        return 0.0;
+    }
+
+    public String getDeliveryDriverName(int orderId) throws SQLException {
+        String sql = """
+            SELECT dp.name
+            FROM food_order fo
+            LEFT JOIN delivery_personnel dp
+                ON fo.delivery_personnel_id = dp.delivery_personnel_id
+            WHERE fo.food_order_id = ?
+            """;
+
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        ps.setInt(1, orderId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next() && rs.getString("name") != null) {
+            return rs.getString("name");
+        }
+
+        return "Not assigned";
     }
 }
