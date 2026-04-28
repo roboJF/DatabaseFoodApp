@@ -102,7 +102,7 @@ public class RestaurantPanel extends JPanel {
         JButton pendingButton = new JButton("Mark Pending");
         JButton readyButton = new JButton("Mark Ready for Pickup");
         JButton outForDeliveryButton = new JButton("Mark Out for Delivery");
-        JButton completeButton = new JButton("Mark Complete");
+        JButton completeButton = new JButton("Mark Delivered");
         JButton refreshOrdersButton = new JButton("Refresh Orders");
 
         orderButtonPanel.add(pendingButton);
@@ -135,7 +135,7 @@ public class RestaurantPanel extends JPanel {
         pendingButton.addActionListener(e -> updateSelectedOrderStatus("PENDING"));
         readyButton.addActionListener(e -> updateSelectedOrderStatus("READY"));
         outForDeliveryButton.addActionListener(e -> updateSelectedOrderStatus("OUT_FOR_DELIVERY"));
-        completeButton.addActionListener(e -> updateSelectedOrderStatus("COMPLETE"));
+        completeButton.addActionListener(e -> updateSelectedOrderStatus("DELIVERED"));
         refreshOrdersButton.addActionListener(e -> loadOrders());
 
         loadMenuItems();

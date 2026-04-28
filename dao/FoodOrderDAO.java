@@ -4,7 +4,6 @@ import model.FoodOrder;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 
 public class FoodOrderDAO {
 
@@ -174,7 +173,7 @@ public class FoodOrderDAO {
 
     public String getDeliveryDriverName(int orderId) throws SQLException {
         String sql = """
-            SELECT dp.name
+            SELECT dp.username
             FROM food_order fo
             LEFT JOIN delivery_personnel dp
                 ON fo.delivery_personnel_id = dp.delivery_personnel_id
@@ -186,8 +185,8 @@ public class FoodOrderDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        if (rs.next() && rs.getString("name") != null) {
-            return rs.getString("name");
+        if (rs.next() && rs.getString("username") != null) {
+            return rs.getString("username");
         }
 
         return "Not assigned";
