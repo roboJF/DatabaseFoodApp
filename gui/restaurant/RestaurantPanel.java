@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class RestaurantPanel extends JPanel {
 
     private int restaurantId;
@@ -54,6 +55,7 @@ public class RestaurantPanel extends JPanel {
         JButton availableButton = new JButton("Mark Available");
         JButton unavailableButton = new JButton("Mark Unavailable");
         JButton refreshMenuButton = new JButton("Refresh Menu");
+        JButton editInfoButton = new JButton("Edit Restaurant Info");
 
         menuButtonPanel.add(addMenuItemButton);
         menuButtonPanel.add(editMenuItemButton);
@@ -61,6 +63,7 @@ public class RestaurantPanel extends JPanel {
         menuButtonPanel.add(availableButton);
         menuButtonPanel.add(unavailableButton);
         menuButtonPanel.add(refreshMenuButton);
+        menuButtonPanel.add(editInfoButton);
 
         menuPanel.add(menuButtonPanel, BorderLayout.SOUTH);
 
@@ -116,6 +119,7 @@ public class RestaurantPanel extends JPanel {
         outForDeliveryButton.addActionListener(e -> updateSelectedOrderStatus("OUT_FOR_DELIVERY"));
         completeButton.addActionListener(e -> updateSelectedOrderStatus("COMPLETE"));
         refreshOrdersButton.addActionListener(e -> loadOrders());
+        editInfoButton.addActionListener(e -> showRestaurantInfo());
 
         loadMenuItems();
         loadOrders();
@@ -356,5 +360,18 @@ public class RestaurantPanel extends JPanel {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error updating order status.");
         }
+    }
+    //show restaurant info
+    private void showRestaurantInfo() {
+        JDialog dialog = new JDialog(
+                (JFrame) SwingUtilities.getWindowAncestor(this),
+                "Edit Restaurant Info",
+                true
+        );
+
+        dialog.setContentPane(new RestaurantInfoPanel(restaurantId));
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 }
