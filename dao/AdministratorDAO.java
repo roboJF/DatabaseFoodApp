@@ -54,10 +54,36 @@ public class AdministratorDAO {
     }
 
     public void delete(int adminId) throws SQLException {
-        String sql = "DELETE FROM administrator WHERE admin_id = ?";
-        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-        ps.setInt(1, adminId);
-        ps.executeUpdate();
+        Connection conn = DBConnection.getConnection();
+        conn.setAutoCommit(false);
+        try {
+            String deleteCustomerLinks = "DELETE FROM admin_manages_customer WHERE admin_id = ?";
+            PreparedStatement ps1 = conn.prepareStatement(deleteCustomerLinks);
+            ps1.setInt(1, adminId);
+            ps1.executeUpdate();
+
+            String deleteBusinessLinks = "DELETE FROM admin_manages_business WHERE admin_id = ?";
+            PreparedStatement ps2 = conn.prepareStatement(deleteBusinessLinks);
+            ps2.setInt(1, adminId);
+            ps2.executeUpdate();
+
+            String deleteDeliveryLinks = "DELETE FROM admin_manages_delivery WHERE admin_id = ?";
+            PreparedStatement ps3 = conn.prepareStatement(deleteDeliveryLinks);
+            ps3.setInt(1, adminId);
+            ps3.executeUpdate();
+
+            String deleteAdmin = "DELETE FROM administrator WHERE admin_id = ?";
+            PreparedStatement ps4 = conn.prepareStatement(deleteAdmin);
+            ps4.setInt(1, adminId);
+            ps4.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
     }
 
     //helper method to turn resultsets into admin objects

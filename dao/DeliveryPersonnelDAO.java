@@ -74,10 +74,33 @@ public class DeliveryPersonnelDAO {
     }
 
     public void delete(int personnelId) throws SQLException {
-        String sql = "DELETE FROM delivery_personnel WHERE delivery_personnel_id = ?";
-        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-        ps.setInt(1, personnelId);
-        ps.executeUpdate();
+        Connection conn = DBConnection.getConnection();
+        conn.setAutoCommit(false);
+        try {
+            //unassigns from orders rather than deleting them, as customers will probably still want their food
+            String unassign = "UPDATE food_order SET delivery_personnel_id = NULL " +
+                              "WHERE delivery_personnel_id = ?";
+            PreparedStatement ps1 = conn.prepareStatement(unassign);
+            ps1.setInt(1, personnelId);
+            ps1.executeUpdate();
+
+            String deleteManages = "DELETE FROM admin_manages_delivery WHERE delivery_personnel_id = ?";
+            PreparedStatement ps2 = conn.prepareStatement(deleteManages);
+            ps2.setInt(1, personnelId);
+            ps2.executeUpdate();
+
+            String deletePersonnel = "DELETE FROM delivery_personnel WHERE delivery_personnel_id = ?";
+            PreparedStatement ps3 = conn.prepareStatement(deletePersonnel);
+            ps3.setInt(1, personnelId);
+            ps3.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
     }
 
     private DeliveryPersonnel mapRow(ResultSet rs) throws SQLException {

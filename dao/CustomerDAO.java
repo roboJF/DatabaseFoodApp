@@ -75,10 +75,38 @@ public class CustomerDAO {
     }
 
     public void delete(int customerId) throws SQLException {
-        String sql = "DELETE FROM customer WHERE customer_id = ?";
-        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-        ps.setInt(1, customerId);
-        ps.executeUpdate();
+        Connection conn = DBConnection.getConnection();
+        conn.setAutoCommit(false);
+        try {
+            String deleteOrderItems = "DELETE oi FROM order_item oi " +
+                                      "JOIN food_order fo ON oi.food_order_id = fo.food_order_id " +
+                                      "WHERE fo.customer_id = ?";
+            PreparedStatement ps1 = conn.prepareStatement(deleteOrderItems);
+            ps1.setInt(1, customerId);
+            ps1.executeUpdate();
+
+            String deleteOrders = "DELETE FROM food_order WHERE customer_id = ?";
+            PreparedStatement ps2 = conn.prepareStatement(deleteOrders);
+            ps2.setInt(1, customerId);
+            ps2.executeUpdate();
+
+            String deleteManages = "DELETE FROM admin_manages_customer WHERE customer_id = ?";
+            PreparedStatement ps3 = conn.prepareStatement(deleteManages);
+            ps3.setInt(1, customerId);
+            ps3.executeUpdate();
+
+            String deleteCustomer = "DELETE FROM customer WHERE customer_id = ?";
+            PreparedStatement ps4 = conn.prepareStatement(deleteCustomer);
+            ps4.setInt(1, customerId);
+            ps4.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
     }
 
     // helper to put a resultset into a customer object
