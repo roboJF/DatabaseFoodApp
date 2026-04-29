@@ -61,22 +61,13 @@ public class MainFrame extends JFrame {
         showPanel("Restaurant", new RestaurantPanel(restaurantId, this));
     }
 
-<<<<<<< HEAD
     public void showDriverPanel(int driverId) {
-        JOptionPane.showMessageDialog(this, "Driver panel coming next. ID: " + driverId);
+        showPanel("Driver", new DriverPanel(this, driverId));
     }
 
     public void showAdminPanel(int adminId) {
-        JOptionPane.showMessageDialog(this, "Admin panel coming next. ID: " + adminId);
+        showPanel("Admin", new AdminPanel(this));
     }
-=======
- public void showDriverPanel(int driverId) {
-    showPanel("Driver", new DriverPanel(this, driverId));
-}
-
-public void showAdminPanel(int adminId) {
-    showPanel("Admin", new AdminPanel(this));
-}
 
     private void showPanel(String name, JPanel panel) {
         mainPanel.add(panel, name);
