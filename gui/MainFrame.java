@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
     }
 
     public void showAdminPanel(int adminId) {
-        showPanel("Admin", new AdminPanel(this));
+        showPanel("Admin", new AdminPanel(this, adminId));
     }
 
     private void showPanel(String name, JPanel panel) {
