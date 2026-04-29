@@ -1,40 +1,41 @@
-package gui.restaurant;
+package gui.driver;
 
-import dao.FoodBusinessDAO;
-import model.FoodBusiness;
+import dao.DeliveryPersonnelDAO;
+import model.DeliveryPersonnel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class RestaurantInfoPanel extends JPanel {
+public class DriverInfoPanel extends JPanel {
 
-    private int restaurantId;
+    private int driverId;
 
-    private JTextField nameField;
-    private JTextField locationField;
+    private JTextField firstNameField;
+    private JTextField lastNameField;
     private JTextField phoneField;
+    private JTextField vehicleField;
     private JTextField usernameField;
     private JTextField emailField;
     private JPasswordField passwordField;
     private JCheckBox showPasswordCheckBox;
 
-    public RestaurantInfoPanel(int restaurantId) {
-        this.restaurantId = restaurantId;
+    public DriverInfoPanel(int driverId) {
+        this.driverId = driverId;
 
         setLayout(new GridBagLayout());
 
         // form panel
-        JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(8, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // input fields
-        nameField = new JTextField(15);
-        locationField = new JTextField(15);
+        firstNameField = new JTextField(15);
+        lastNameField = new JTextField(15);
         phoneField = new JTextField(15);
+        vehicleField = new JTextField(15);
         usernameField = new JTextField(15);
         usernameField.setEditable(false);
         usernameField.setFocusable(false);
-
         emailField = new JTextField(15);
 
         // password field
@@ -48,14 +49,17 @@ public class RestaurantInfoPanel extends JPanel {
         JButton refreshButton = new JButton("Refresh");
 
         // form layout
-        formPanel.add(new JLabel("Restaurant Name:"));
-        formPanel.add(nameField);
+        formPanel.add(new JLabel("First Name:"));
+        formPanel.add(firstNameField);
 
-        formPanel.add(new JLabel("Location:"));
-        formPanel.add(locationField);
+        formPanel.add(new JLabel("Last Name:"));
+        formPanel.add(lastNameField);
 
         formPanel.add(new JLabel("Phone:"));
         formPanel.add(phoneField);
+
+        formPanel.add(new JLabel("Vehicle Details:"));
+        formPanel.add(vehicleField);
 
         formPanel.add(new JLabel("Username:"));
         formPanel.add(usernameField);
@@ -88,70 +92,73 @@ public class RestaurantInfoPanel extends JPanel {
         });
 
         // button actions
-        refreshButton.addActionListener(e -> loadRestaurantInfo());
-        saveButton.addActionListener(e -> saveRestaurantInfo());
+        refreshButton.addActionListener(e -> loadDriverInfo());
+        saveButton.addActionListener(e -> saveDriverInfo());
 
-        loadRestaurantInfo();
+        loadDriverInfo();
     }
 
-    // load restaurant info
-    private void loadRestaurantInfo() {
+    // load driver info
+    private void loadDriverInfo() {
         try {
-            FoodBusiness restaurant = new FoodBusinessDAO().getById(restaurantId);
+            DeliveryPersonnel driver = new DeliveryPersonnelDAO().getById(driverId);
 
-            if (restaurant == null) {
-                JOptionPane.showMessageDialog(this, "Restaurant not found.");
+            if (driver == null) {
+                JOptionPane.showMessageDialog(this, "Driver not found.");
                 return;
             }
 
-            nameField.setText(restaurant.getName());
-            locationField.setText(restaurant.getLocation());
-            phoneField.setText(restaurant.getContactInfo());
-            usernameField.setText(restaurant.getUsername());
-            emailField.setText(restaurant.getEmail());
-            passwordField.setText(restaurant.getPassword());
+            firstNameField.setText(driver.getFirstName());
+            lastNameField.setText(driver.getLastName());
+            phoneField.setText(driver.getContactInfo());
+            vehicleField.setText(driver.getVehicleDetails());
+            usernameField.setText(driver.getUsername());
+            emailField.setText(driver.getEmail());
+            passwordField.setText(driver.getPassword());
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading restaurant info.");
+            JOptionPane.showMessageDialog(this, "Error loading driver info.");
         }
     }
 
-    // save restaurant info
-    private void saveRestaurantInfo() {
-        String name = nameField.getText().trim();
-        String location = locationField.getText().trim();
+    // save driver info
+    private void saveDriverInfo() {
+        String firstName = firstNameField.getText().trim();
+        String lastName = lastNameField.getText().trim();
         String phone = phoneField.getText().trim();
+        String vehicle = vehicleField.getText().trim();
         String username = usernameField.getText().trim();
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
 
         // check required fields
-        if (name.isEmpty() || location.isEmpty()
+        if (firstName.isEmpty() || lastName.isEmpty()
                 || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill required fields.");
             return;
         }
 
         try {
-            FoodBusiness updatedRestaurant = new FoodBusiness(
-                    restaurantId,
-                    name,
-                    location,
+            DeliveryPersonnel updatedDriver = new DeliveryPersonnel(
+                    driverId,
+                    firstName,
+                    lastName,
                     phone,
+                    vehicle,
                     username,
                     email,
                     password
             );
 
-            // update existing restaurant in database
-            new FoodBusinessDAO().update(updatedRestaurant);
+            // update driver in database
+            new DeliveryPersonnelDAO().update(updatedDriver);
 
-            JOptionPane.showMessageDialog(this, "Restaurant info updated.");
+            JOptionPane.showMessageDialog(this, "Driver info updated.");
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error updating restaurant info.");
+            JOptionPane.showMessageDialog(this, "Error updating driver info.");
         }
     }
 }

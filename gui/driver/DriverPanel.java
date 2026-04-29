@@ -1,25 +1,24 @@
-package gui.restaurant;
+package gui.driver;
 
 import gui.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class RestaurantPanel extends JPanel {
+public class DriverPanel extends JPanel {
 
-    private int restaurantId;
+    private int driverId;
     private MainFrame mainFrame;
 
-    public RestaurantPanel(int restaurantId, MainFrame mainFrame) {
-        this.restaurantId = restaurantId;
+    public DriverPanel(MainFrame mainFrame, int driverId) {
         this.mainFrame = mainFrame;
+        this.driverId = driverId;
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // title label
-        JLabel titleLabel = new JLabel("Restaurant Dashboard");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel titleLabel = new JLabel("Driver Dashboard");
 
         // logout button
         JButton logoutButton = new JButton("Logout");
@@ -31,9 +30,8 @@ public class RestaurantPanel extends JPanel {
 
         // tabbed pane
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Menu", new RestaurantMenuPanel(restaurantId));
-        tabs.addTab("Orders", new RestaurantOrdersPanel(restaurantId));
-        tabs.addTab("My Info", new RestaurantInfoPanel(restaurantId));
+        tabs.addTab("Orders", new DriverOrdersPanel(driverId));
+        tabs.addTab("My Info", new DriverInfoPanel(driverId));
 
         // main layout
         add(topPanel, BorderLayout.NORTH);

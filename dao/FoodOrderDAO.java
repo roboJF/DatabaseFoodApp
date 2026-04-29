@@ -7,22 +7,23 @@ import java.util.List;
 
 public class FoodOrderDAO {
 
-    //i set this to return the id since if someone is making an order, i assume you would also want the id immediately
+    // i set this to return the id since if someone is making an order, i assume you
+    // would also want the id immediately
     public int insert(FoodOrder order) throws SQLException {
         String sql = """
                 INSERT INTO food_order (order_status, customer_id, food_business_id)
                 VALUES (?, ?, ?)
                 """;
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(
-            sql, Statement.RETURN_GENERATED_KEYS
-        );
+                sql, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, order.getOrderStatus());
         ps.setInt(2, order.getCustomerId());
         ps.setInt(3, order.getFoodBusinessId());
         ps.executeUpdate();
 
         ResultSet keys = ps.getGeneratedKeys();
-        if (keys.next()) return keys.getInt(1);
+        if (keys.next())
+            return keys.getInt(1);
         throw new SQLException("Failed to retrieve generated order ID.");
     }
 
@@ -31,7 +32,8 @@ public class FoodOrderDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, foodOrderId);
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) return mapRow(rs);
+        if (rs.next())
+            return mapRow(rs);
         return null;
     }
 
@@ -41,7 +43,8 @@ public class FoodOrderDAO {
         ps.setInt(1, customerId);
         ResultSet rs = ps.executeQuery();
         List<FoodOrder> orders = new ArrayList<>();
-        while (rs.next()) orders.add(mapRow(rs));
+        while (rs.next())
+            orders.add(mapRow(rs));
         return orders;
     }
 
@@ -51,7 +54,8 @@ public class FoodOrderDAO {
         ps.setInt(1, foodBusinessId);
         ResultSet rs = ps.executeQuery();
         List<FoodOrder> orders = new ArrayList<>();
-        while (rs.next()) orders.add(mapRow(rs));
+        while (rs.next())
+            orders.add(mapRow(rs));
         return orders;
     }
 
@@ -61,21 +65,23 @@ public class FoodOrderDAO {
         ps.setInt(1, personnelId);
         ResultSet rs = ps.executeQuery();
         List<FoodOrder> orders = new ArrayList<>();
-        while (rs.next()) orders.add(mapRow(rs));
+        while (rs.next())
+            orders.add(mapRow(rs));
         return orders;
     }
 
-    //grabs orders that are ready to be delivered but dont have delivery people
     public List<FoodOrder> getUnassignedOrders() throws SQLException {
-        String sql = """
-                SELECT * FROM food_order
-                WHERE delivery_personnel_id IS NULL
-                AND order_status = 'READY'
-                """;
+        List<FoodOrder> orders = new ArrayList<>();
+
+        String sql = "SELECT * FROM food_order WHERE delivery_personnel_id IS NULL";
+
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
-        List<FoodOrder> orders = new ArrayList<>();
-        while (rs.next()) orders.add(mapRow(rs));
+
+        while (rs.next()) {
+            orders.add(mapRow(rs));
+        }
+
         return orders;
     }
 
@@ -84,7 +90,8 @@ public class FoodOrderDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         List<FoodOrder> orders = new ArrayList<>();
-        while (rs.next()) orders.add(mapRow(rs));
+        while (rs.next())
+            orders.add(mapRow(rs));
         return orders;
     }
 
@@ -104,6 +111,14 @@ public class FoodOrderDAO {
         ps.executeUpdate();
     }
 
+    // unassign delivery personnel
+    public void unassignDeliveryPersonnel(int orderId) throws SQLException {
+        String sql = "UPDATE food_order SET delivery_personnel_id = NULL WHERE food_order_id = ?";
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        ps.setInt(1, orderId);
+        ps.executeUpdate();
+    }
+
     public void delete(int foodOrderId) throws SQLException {
         String sql = "DELETE FROM food_order WHERE food_order_id = ?";
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
@@ -111,26 +126,37 @@ public class FoodOrderDAO {
         ps.executeUpdate();
     }
 
+    // private FoodOrder mapRow(ResultSet rs) throws SQLException {
+    // int personnelId = rs.getInt("delivery_personnel_id");
+    // if (rs.wasNull()) personnelId = 0;
+
+    // return new FoodOrder(
+    // rs.getInt("food_order_id"),
+    // rs.getString("order_status"),
+    // rs.getInt("customer_id"),
+    // rs.getInt("food_business_id"),
+    // personnelId
+    // );
+    // }
+
     private FoodOrder mapRow(ResultSet rs) throws SQLException {
-        int personnelId = rs.getInt("delivery_personnel_id");
-        if (rs.wasNull()) personnelId = 0;
+        Integer personnelId = (Integer) rs.getObject("delivery_personnel_id");
 
         return new FoodOrder(
-            rs.getInt("food_order_id"),
-            rs.getString("order_status"),
-            rs.getInt("customer_id"),
-            rs.getInt("food_business_id"),
-            personnelId
-        );
+                rs.getInt("food_order_id"),
+                rs.getString("order_status"),
+                rs.getInt("customer_id"),
+                rs.getInt("food_business_id"),
+                personnelId == null ? null : personnelId);
     }
 
     public String getOrderItemsText(int orderId) throws SQLException {
         String sql = """
-            SELECT mi.name, oi.quantity
-            FROM order_item oi
-            JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
-            WHERE oi.food_order_id = ?
-            """;
+                SELECT mi.name, oi.quantity
+                FROM order_item oi
+                JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                WHERE oi.food_order_id = ?
+                """;
 
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, orderId);
@@ -153,11 +179,11 @@ public class FoodOrderDAO {
 
     public double getOrderTotal(int orderId) throws SQLException {
         String sql = """
-            SELECT SUM(mi.price * oi.quantity) AS total
-            FROM order_item oi
-            JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
-            WHERE oi.food_order_id = ?
-            """;
+                SELECT SUM(mi.price * oi.quantity) AS total
+                FROM order_item oi
+                JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                WHERE oi.food_order_id = ?
+                """;
 
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, orderId);
@@ -173,12 +199,12 @@ public class FoodOrderDAO {
 
     public String getDeliveryDriverName(int orderId) throws SQLException {
         String sql = """
-            SELECT dp.username
-            FROM food_order fo
-            LEFT JOIN delivery_personnel dp
-                ON fo.delivery_personnel_id = dp.delivery_personnel_id
-            WHERE fo.food_order_id = ?
-            """;
+                SELECT dp.username
+                FROM food_order fo
+                LEFT JOIN delivery_personnel dp
+                    ON fo.delivery_personnel_id = dp.delivery_personnel_id
+                WHERE fo.food_order_id = ?
+                """;
 
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, orderId);

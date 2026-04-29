@@ -1,7 +1,7 @@
 package gui.create;
 
 import gui.MainFrame;
-import dao.FoodBusinessDAO;
+import dao.*;
 import model.FoodBusiness;
 
 import javax.swing.*;
@@ -101,6 +101,18 @@ public class CreateRestaurantPanel extends JPanel {
                 return;
             }
 
+            // check username across every account type
+            try{
+                if(usernameExists(username)){
+                    JOptionPane.showMessageDialog(this, "Username Already Exists. Please Choose Another Username.");
+                    return;
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error Checking Username.");
+                return;
+            }
+
             try{
                 FoodBusiness restaurant = new FoodBusiness(
                     0,
@@ -124,4 +136,13 @@ public class CreateRestaurantPanel extends JPanel {
             }
         });
     }
+
+    // checks if username already belongs to any account type
+    private boolean usernameExists(String username) throws Exception {
+        return new CustomerDAO().getByUsername(username) != null
+            || new FoodBusinessDAO().getByUsername(username) != null
+            || new DeliveryPersonnelDAO().getByUsername(username) != null
+            || new AdministratorDAO().getByUsername(username) != null;
+    }
+
 }

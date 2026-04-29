@@ -34,6 +34,8 @@ public class CustomerInfoPanel extends JPanel {
         addressField = new JTextField(15);
         phoneField = new JTextField(15);
         usernameField = new JTextField(15);
+        usernameField.setEditable(false);
+        usernameField.setFocusable(false);
         emailField = new JTextField(15);
 
         // password field
