@@ -214,7 +214,53 @@ public class FoodOrderDAO {
         if (rs.next() && rs.getString("username") != null) {
             return rs.getString("username");
         }
-
         return "Not assigned";
+    }
+
+    public ResultSet getOrderCountPerCustomer() throws SQLException {
+        String sql = """
+                SELECT CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+                   COUNT(fo.food_order_id) AS total_orders
+                FROM customer c
+                LEFT JOIN food_order fo ON c.customer_id = fo.customer_id
+                GROUP BY c.customer_id, c.first_name, c.last_name
+                """;
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        return ps.executeQuery();
+    }
+
+    public ResultSet getRevenuePerBusiness() throws SQLException {
+        String sql = """
+                SELECT fb.name AS business_name,
+                   SUM(mi.price * oi.quantity) AS total_revenue
+                FROM food_business fb
+                JOIN food_order fo ON fb.food_business_id = fo.food_business_id
+                JOIN order_item oi ON fo.food_order_id = oi.food_order_id
+                JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                WHERE fo.order_status = 'DELIVERED'
+                GROUP BY fb.food_business_id, fb.name
+                ORDER BY total_revenue DESC
+                """;
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        return ps.executeQuery();
+    }
+
+    public ResultSet getAvgOrderValuePerBusiness() throws SQLException {
+        String sql = """
+        SELECT fb.name AS business_name,
+                   ROUND(AVG(order_total), 2) AS avg_order_value
+            FROM food_business fb
+            JOIN food_order fo ON fb.food_business_id = fo.food_business_id
+            JOIN (
+                SELECT oi.food_order_id,
+                       SUM(mi.price * oi.quantity) AS order_total
+                FROM order_item oi
+                JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                GROUP BY oi.food_order_id
+            ) order_totals ON fo.food_order_id = order_totals.food_order_id
+            GROUP BY fb.food_business_id, fb.name
+                """;
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        return ps.executeQuery();
     }
 }

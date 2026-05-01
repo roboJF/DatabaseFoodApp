@@ -55,6 +55,7 @@ public class AdminPanel extends JPanel {
         tabs.addTab("Customers", new AdminCustomerPanel(adminId));
         tabs.addTab("Food Businesses", new AdminBusinessPanel(adminId));
         tabs.addTab("Delivery Personnel", new AdminDriverPanel(adminId));
+        tabs.addTab("Statistics", new AdminStatsPanel());
 
         return tabs;
     }
