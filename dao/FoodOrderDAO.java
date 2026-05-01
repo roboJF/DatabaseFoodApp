@@ -108,11 +108,23 @@ public class FoodOrderDAO {
     }
 
     public void assignDeliveryPersonnel(int foodOrderId, int personnelId) throws SQLException {
-        String sql = "UPDATE food_order SET delivery_personnel_id = ? WHERE food_order_id = ?";
+        String sql = """
+                UPDATE food_order
+                SET delivery_personnel_id = ?, order_status = 'OUT_FOR_DELIVERY'
+                WHERE food_order_id = ?
+                AND order_status = 'READY'
+                AND delivery_personnel_id IS NULL
+                """;
+
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, personnelId);
         ps.setInt(2, foodOrderId);
-        ps.executeUpdate();
+
+        int rows = ps.executeUpdate();
+
+        if (rows == 0) {
+            throw new SQLException("Order is not available for assignment.");
+        }
     }
 
     // unassign delivery personnel and make the order available again
