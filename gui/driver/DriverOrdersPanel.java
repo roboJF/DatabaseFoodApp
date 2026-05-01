@@ -43,6 +43,10 @@ public class DriverOrdersPanel extends JPanel {
         activeTable = new JTable(activeModel);
         deliveredTable = new JTable(deliveredModel);
 
+        applyStatusRenderer(availableTable);
+        applyStatusRenderer(activeTable);
+        applyStatusRenderer(deliveredTable);
+
         JPanel availablePanel = buildAvailablePanel();
         JPanel activePanel = buildActivePanel();
         JPanel deliveredPanel = buildDeliveredPanel();
@@ -78,7 +82,6 @@ public class DriverOrdersPanel extends JPanel {
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // button actions
         takeOrderButton.addActionListener(e -> takeOrder());
         refreshButton.addActionListener(e -> loadOrders());
 
@@ -105,7 +108,6 @@ public class DriverOrdersPanel extends JPanel {
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // button actions
         unassignButton.addActionListener(e -> unassignOrder());
         markPickedUpButton.addActionListener(e -> markPickedUp());
         markDeliveredButton.addActionListener(e -> markDelivered());
@@ -128,7 +130,6 @@ public class DriverOrdersPanel extends JPanel {
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // button actions
         refreshButton.addActionListener(e -> loadOrders());
 
         return panel;
@@ -137,7 +138,7 @@ public class DriverOrdersPanel extends JPanel {
     // build table model
     private DefaultTableModel buildOrderModel() {
         return new DefaultTableModel(
-                new String[] {
+                new String[]{
                         "Order ID",
                         "Restaurant",
                         "Restaurant Location",
@@ -150,6 +151,52 @@ public class DriverOrdersPanel extends JPanel {
                 return false;
             }
         };
+    }
+
+    // display formatted status while keeping raw status in table model
+    private void applyStatusRenderer(JTable table) {
+        table.getColumnModel().getColumn(5).setCellRenderer((tbl, value, isSelected, hasFocus, row, column) -> {
+            JLabel label = new JLabel(formatStatus(value == null ? "" : value.toString()));
+            label.setFont(tbl.getFont());
+            label.setOpaque(true);
+
+            if (isSelected) {
+                label.setBackground(tbl.getSelectionBackground());
+                label.setForeground(tbl.getSelectionForeground());
+            } else {
+                label.setBackground(tbl.getBackground());
+                label.setForeground(tbl.getForeground());
+            }
+
+            return label;
+        });
+    }
+
+    // format the status string displayed to user
+    private String formatStatus(String status) {
+        if (status == null) {
+            return "";
+        }
+
+        String[] words = status.toLowerCase().split("_");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            if (word.equals("for")) {
+                result.append("for");
+            } else {
+                result.append(word.substring(0, 1).toUpperCase())
+                        .append(word.substring(1));
+            }
+
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
     }
 
     // load orders
@@ -166,12 +213,10 @@ public class DriverOrdersPanel extends JPanel {
             List<FoodOrder> availableOrders = orderDAO.getUnassignedOrders();
             List<FoodOrder> myOrders = orderDAO.getByDeliveryPersonnel(driverId);
 
-            // available orders
             for (FoodOrder order : availableOrders) {
                 addOrderRow(availableModel, order, businessDAO, customerDAO);
             }
 
-            // driver orders
             for (FoodOrder order : myOrders) {
                 if (order.getOrderStatus().equals("DELIVERED")) {
                     addOrderRow(deliveredModel, order, businessDAO, customerDAO);
@@ -193,7 +238,7 @@ public class DriverOrdersPanel extends JPanel {
         FoodBusiness business = businessDAO.getById(order.getFoodBusinessId());
         Customer customer = customerDAO.getById(order.getCustomerId());
 
-        model.addRow(new Object[] {
+        model.addRow(new Object[]{
                 order.getFoodOrderId(),
                 business != null ? business.getName() : "Unknown",
                 business != null ? business.getLocation() : "Unknown",

@@ -32,17 +32,17 @@ public class RestaurantOrdersPanel extends JPanel {
     // build panel
     private void buildPanel() {
         orderModel = new DefaultTableModel(
-                new String[]{
+                new String[] {
                         "Order ID",
                         "Customer ID",
                         "Customer Name",
                         "Items",
                         "Total Price",
+                        "Driver ID",
                         "Delivery Driver",
                         "Status"
                 },
-                0
-        ) {
+                0) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -50,7 +50,16 @@ public class RestaurantOrdersPanel extends JPanel {
 
         orderTable = new JTable(orderModel);
         orderTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        orderTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
+        orderTable.getColumnModel().getColumn(0).setPreferredWidth(60); // Order ID
+        orderTable.getColumnModel().getColumn(1).setPreferredWidth(90); // Customer ID
+        orderTable.getColumnModel().getColumn(2).setPreferredWidth(130); // Customer Name
+        orderTable.getColumnModel().getColumn(3).setPreferredWidth(210); // Items
+        orderTable.getColumnModel().getColumn(4).setPreferredWidth(90); // Total Price
+        orderTable.getColumnModel().getColumn(5).setPreferredWidth(70); // Driver ID
+        orderTable.getColumnModel().getColumn(6).setPreferredWidth(130); // Delivery Driver
+        orderTable.getColumnModel().getColumn(7).setPreferredWidth(160); // Status
         JButton pendingButton = new JButton("Mark Pending");
         JButton readyButton = new JButton("Mark Ready for Pickup");
         JButton refreshButton = new JButton("Refresh Orders");
@@ -85,14 +94,15 @@ public class RestaurantOrdersPanel extends JPanel {
                 Customer customer = customerDAO.getById(order.getCustomerId());
                 String customerName = customer != null ? customer.getFullName() : "Unknown";
 
-                orderModel.addRow(new Object[]{
+                orderModel.addRow(new Object[] {
                         order.getFoodOrderId(),
                         order.getCustomerId(),
                         customerName,
                         items,
                         String.format("$%.2f", total),
+                        order.getDeliveryPersonnelId() == null ? "Not assigned" : order.getDeliveryPersonnelId(),
                         driver,
-                        order.getOrderStatus()
+                        formatStatus(order.getOrderStatus())
                 });
             }
 
@@ -100,6 +110,30 @@ public class RestaurantOrdersPanel extends JPanel {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error loading orders.");
         }
+    }
+
+    // format the status string displayed to user
+    private String formatStatus(String status) {
+        if (status == null)
+            return "";
+
+        String[] words = status.toLowerCase().split("_");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            // capitalize first letter
+            word = word.substring(0, 1).toUpperCase() + word.substring(1);
+
+            result.append(word);
+
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
     }
 
     // update selected order status (RESTRICTED)
@@ -118,8 +152,7 @@ public class RestaurantOrdersPanel extends JPanel {
         if (!currentStatus.equals("PENDING") && !currentStatus.equals("READY")) {
             JOptionPane.showMessageDialog(
                     this,
-                    "This order has already been claimed by a driver.\nThe restaurant can no longer change its status."
-            );
+                    "This order has already been claimed by a driver.\nThe restaurant can no longer change its status.");
             return;
         }
 
