@@ -73,7 +73,11 @@ public class FoodOrderDAO {
     public List<FoodOrder> getUnassignedOrders() throws SQLException {
         List<FoodOrder> orders = new ArrayList<>();
 
-        String sql = "SELECT * FROM food_order WHERE delivery_personnel_id IS NULL";
+        String sql = """
+                    SELECT * FROM food_order
+                    WHERE delivery_personnel_id IS NULL
+                    AND order_status = 'READY'
+                """;
 
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
@@ -111,9 +115,14 @@ public class FoodOrderDAO {
         ps.executeUpdate();
     }
 
-    // unassign delivery personnel
+    // unassign delivery personnel and make the order available again
     public void unassignDeliveryPersonnel(int orderId) throws SQLException {
-        String sql = "UPDATE food_order SET delivery_personnel_id = NULL WHERE food_order_id = ?";
+        String sql = """
+                UPDATE food_order
+                SET delivery_personnel_id = NULL, order_status = 'READY'
+                WHERE food_order_id = ?
+                """;
+
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         ps.setInt(1, orderId);
         ps.executeUpdate();
@@ -247,19 +256,19 @@ public class FoodOrderDAO {
 
     public ResultSet getAvgOrderValuePerBusiness() throws SQLException {
         String sql = """
-        SELECT fb.name AS business_name,
-                   ROUND(AVG(order_total), 2) AS avg_order_value
-            FROM food_business fb
-            JOIN food_order fo ON fb.food_business_id = fo.food_business_id
-            JOIN (
-                SELECT oi.food_order_id,
-                       SUM(mi.price * oi.quantity) AS order_total
-                FROM order_item oi
-                JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
-                GROUP BY oi.food_order_id
-            ) order_totals ON fo.food_order_id = order_totals.food_order_id
-            GROUP BY fb.food_business_id, fb.name
-                """;
+                SELECT fb.name AS business_name,
+                           ROUND(AVG(order_total), 2) AS avg_order_value
+                    FROM food_business fb
+                    JOIN food_order fo ON fb.food_business_id = fo.food_business_id
+                    JOIN (
+                        SELECT oi.food_order_id,
+                               SUM(mi.price * oi.quantity) AS order_total
+                        FROM order_item oi
+                        JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+                        GROUP BY oi.food_order_id
+                    ) order_totals ON fo.food_order_id = order_totals.food_order_id
+                    GROUP BY fb.food_business_id, fb.name
+                        """;
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         return ps.executeQuery();
     }

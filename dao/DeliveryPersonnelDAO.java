@@ -78,8 +78,8 @@ public class DeliveryPersonnelDAO {
         conn.setAutoCommit(false);
         try {
             //unassigns from orders rather than deleting them, as customers will probably still want their food
-            String unassign = "UPDATE food_order SET delivery_personnel_id = NULL " +
-                              "WHERE delivery_personnel_id = ?";
+            String unassign = "UPDATE food_order SET delivery_personnel_id = NULL, order_status = 'READY' " +
+                            "WHERE delivery_personnel_id = ?";
             PreparedStatement ps1 = conn.prepareStatement(unassign);
             ps1.setInt(1, personnelId);
             ps1.executeUpdate();

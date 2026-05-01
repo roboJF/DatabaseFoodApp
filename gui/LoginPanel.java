@@ -37,7 +37,15 @@ public class LoginPanel extends JPanel {
         formPanel.add(loginButton);
 
         // main layout
-        add(formPanel);
+        JLabel titleLabel = new JLabel("My Foodie");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel wrapper = new JPanel(new BorderLayout(10, 10));
+        wrapper.add(titleLabel, BorderLayout.NORTH);
+        wrapper.add(formPanel, BorderLayout.CENTER);
+
+        add(wrapper);
 
         // navigation action
         createAccountButton.addActionListener(e -> {

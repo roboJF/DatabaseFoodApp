@@ -53,25 +53,18 @@ public class RestaurantOrdersPanel extends JPanel {
 
         JButton pendingButton = new JButton("Mark Pending");
         JButton readyButton = new JButton("Mark Ready for Pickup");
-        JButton outForDeliveryButton = new JButton("Mark Out for Delivery");
-        JButton completeButton = new JButton("Mark Delivered");
         JButton refreshButton = new JButton("Refresh Orders");
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(pendingButton);
         buttonPanel.add(readyButton);
-        buttonPanel.add(outForDeliveryButton);
-        buttonPanel.add(completeButton);
         buttonPanel.add(refreshButton);
 
         add(new JScrollPane(orderTable), BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // button actions
         pendingButton.addActionListener(e -> updateSelectedOrderStatus("PENDING"));
         readyButton.addActionListener(e -> updateSelectedOrderStatus("READY"));
-        outForDeliveryButton.addActionListener(e -> updateSelectedOrderStatus("OUT_FOR_DELIVERY"));
-        completeButton.addActionListener(e -> updateSelectedOrderStatus("DELIVERED"));
         refreshButton.addActionListener(e -> loadOrders());
     }
 
@@ -109,7 +102,7 @@ public class RestaurantOrdersPanel extends JPanel {
         }
     }
 
-    // update selected order status
+    // update selected order status (RESTRICTED)
     private void updateSelectedOrderStatus(String status) {
         int row = orderTable.getSelectedRow();
 
@@ -119,6 +112,16 @@ public class RestaurantOrdersPanel extends JPanel {
         }
 
         FoodOrder selectedOrder = orderList.get(row);
+        String currentStatus = selectedOrder.getOrderStatus();
+
+        // Only allow changes if still in restaurant control
+        if (!currentStatus.equals("PENDING") && !currentStatus.equals("READY")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This order has already been picked up by a driver.\nThe restaurant can no longer change its status."
+            );
+            return;
+        }
 
         try {
             new FoodOrderDAO().updateStatus(selectedOrder.getFoodOrderId(), status);

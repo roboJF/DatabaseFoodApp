@@ -23,11 +23,18 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
+        mainPanel.add(new SQLLoginPanel(this), "SQL Login");
         mainPanel.add(new LoginPanel(this), "Login");
 
         add(mainPanel);
 
-        showLoginPanel();
+        showSQLLoginPanel();
+    }
+
+    public void showSQLLoginPanel() {
+        cardLayout.show(mainPanel, "SQL Login");
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     public void showLoginPanel() {
