@@ -85,7 +85,7 @@ CREATE TABLE food_order (
     FOREIGN KEY (food_business_id) REFERENCES food_business(food_business_id),
     FOREIGN KEY (delivery_personnel_id) REFERENCES delivery_personnel(delivery_personnel_id),
     CONSTRAINT check_status CHECK (order_status IN 
-    ('PENDING', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED'))
+    ('PENDING', 'PREPARING', 'READY', 'ASSIGNED', 'OUT_FOR_DELIVERY', 'DELIVERED'))
 );
 
 CREATE TABLE order_item (

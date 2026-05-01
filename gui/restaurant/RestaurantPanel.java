@@ -31,8 +31,8 @@ public class RestaurantPanel extends JPanel {
 
         // tabbed pane
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Menu", new RestaurantMenuPanel(restaurantId));
         tabs.addTab("Orders", new RestaurantOrdersPanel(restaurantId));
+        tabs.addTab("Menu", new RestaurantMenuPanel(restaurantId));
         tabs.addTab("My Info", new RestaurantInfoPanel(restaurantId));
 
         // main layout

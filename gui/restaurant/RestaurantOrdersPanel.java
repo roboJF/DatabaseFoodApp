@@ -118,7 +118,7 @@ public class RestaurantOrdersPanel extends JPanel {
         if (!currentStatus.equals("PENDING") && !currentStatus.equals("READY")) {
             JOptionPane.showMessageDialog(
                     this,
-                    "This order has already been picked up by a driver.\nThe restaurant can no longer change its status."
+                    "This order has already been claimed by a driver.\nThe restaurant can no longer change its status."
             );
             return;
         }

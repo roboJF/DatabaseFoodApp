@@ -110,7 +110,7 @@ public class FoodOrderDAO {
     public void assignDeliveryPersonnel(int foodOrderId, int personnelId) throws SQLException {
         String sql = """
                 UPDATE food_order
-                SET delivery_personnel_id = ?, order_status = 'OUT_FOR_DELIVERY'
+                SET delivery_personnel_id = ?, order_status = 'ASSIGNED'
                 WHERE food_order_id = ?
                 AND order_status = 'READY'
                 AND delivery_personnel_id IS NULL

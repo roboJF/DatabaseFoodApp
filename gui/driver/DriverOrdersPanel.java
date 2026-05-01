@@ -50,15 +50,13 @@ public class DriverOrdersPanel extends JPanel {
         JSplitPane lowerSplit = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,
                 activePanel,
-                deliveredPanel
-        );
+                deliveredPanel);
         lowerSplit.setResizeWeight(0.5);
 
         JSplitPane mainSplit = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,
                 availablePanel,
-                lowerSplit
-        );
+                lowerSplit);
         mainSplit.setResizeWeight(0.33);
 
         add(mainSplit, BorderLayout.CENTER);
@@ -139,7 +137,7 @@ public class DriverOrdersPanel extends JPanel {
     // build table model
     private DefaultTableModel buildOrderModel() {
         return new DefaultTableModel(
-                new String[]{
+                new String[] {
                         "Order ID",
                         "Restaurant",
                         "Restaurant Location",
@@ -147,8 +145,7 @@ public class DriverOrdersPanel extends JPanel {
                         "Delivery Address",
                         "Status"
                 },
-                0
-        ) {
+                0) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -191,12 +188,12 @@ public class DriverOrdersPanel extends JPanel {
 
     // add order row
     private void addOrderRow(DefaultTableModel model, FoodOrder order,
-                             FoodBusinessDAO businessDAO, CustomerDAO customerDAO) throws Exception {
+            FoodBusinessDAO businessDAO, CustomerDAO customerDAO) throws Exception {
 
         FoodBusiness business = businessDAO.getById(order.getFoodBusinessId());
         Customer customer = customerDAO.getById(order.getCustomerId());
 
-        model.addRow(new Object[]{
+        model.addRow(new Object[] {
                 order.getFoodOrderId(),
                 business != null ? business.getName() : "Unknown",
                 business != null ? business.getLocation() : "Unknown",
@@ -243,8 +240,7 @@ public class DriverOrdersPanel extends JPanel {
                 "Are you sure you want to unassign order #" + orderId + "?",
                 "Confirm Unassign",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm != JOptionPane.YES_OPTION) {
             return;
@@ -270,6 +266,12 @@ public class DriverOrdersPanel extends JPanel {
         }
 
         int orderId = (int) activeModel.getValueAt(row, 0);
+        String status = (String) activeModel.getValueAt(row, 5);
+
+        if (!status.equals("ASSIGNED")) {
+            JOptionPane.showMessageDialog(this, "Only assigned orders can be marked as picked up.");
+            return;
+        }
 
         try {
             new FoodOrderDAO().updateStatus(orderId, "OUT_FOR_DELIVERY");
@@ -291,6 +293,12 @@ public class DriverOrdersPanel extends JPanel {
         }
 
         int orderId = (int) activeModel.getValueAt(row, 0);
+        String status = (String) activeModel.getValueAt(row, 5);
+
+        if (!status.equals("OUT_FOR_DELIVERY")) {
+            JOptionPane.showMessageDialog(this, "Only out-for-delivery orders can be marked as delivered.");
+            return;
+        }
 
         try {
             new FoodOrderDAO().updateStatus(orderId, "DELIVERED");
