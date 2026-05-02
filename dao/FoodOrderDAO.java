@@ -284,4 +284,28 @@ public class FoodOrderDAO {
         PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
         return ps.executeQuery();
     }
+
+    public ResultSet getDeliveryCountPerDriver() throws SQLException {
+        String sql = """
+                SELECT CONCAT(dp.first_name, ' ', dp.last_name) AS driver_name,
+                    COUNT(fo.food_order_id) AS total_deliveries
+                FROM delivery_personnel dp
+                LEFT JOIN food_order fo ON dp.delivery_personnel_id = fo.delivery_personnel_id
+                GROUP BY dp.delivery_personnel_id, dp.first_name, dp.last_name
+                """;
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        return ps.executeQuery();
+    }
+
+    public ResultSet getMenuItemCountPerBusiness() throws SQLException {
+        String sql = """
+                SELECT fb.name AS business_name,
+                    COUNT(mi.menu_item_id) AS total_items
+                FROM food_business fb
+                LEFT JOIN menu_item mi ON fb.food_business_id = mi.food_business_id
+                GROUP BY fb.food_business_id, fb.name
+                """;
+        PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
+        return ps.executeQuery();
+    }
 }

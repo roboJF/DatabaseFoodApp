@@ -13,6 +13,8 @@ public class AdminStatsPanel extends JPanel {
     private DefaultTableModel orderCountModel;
     private DefaultTableModel revenueModel;
     private DefaultTableModel avgModel;
+    private DefaultTableModel deliveryCountModel;
+    private DefaultTableModel menuItemCountModel;
 
     public AdminStatsPanel() {
         setLayout(new BorderLayout(5, 5));
@@ -68,11 +70,43 @@ public class AdminStatsPanel extends JPanel {
         avgPanel.add(avgLabel, BorderLayout.NORTH);
         avgPanel.add(new JScrollPane(avgTable), BorderLayout.CENTER);
 
+        //deliveries made per driver
+        JLabel deliveryCountLabel = new JLabel("Total Deliveries Per Driver");
+        deliveryCountLabel.setFont(new Font("Arial", Font.BOLD, 13));
+
+        String[] deliveryCountCols = {"Driver Name", "Total Deliveries"};
+        deliveryCountModel = new DefaultTableModel(deliveryCountCols, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable deliveryCountTable = new JTable(deliveryCountModel);
+        deliveryCountTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JPanel deliveryCountPanel = new JPanel(new BorderLayout(5, 5));
+        deliveryCountPanel.add(deliveryCountLabel, BorderLayout.NORTH);
+        deliveryCountPanel.add(new JScrollPane(deliveryCountTable), BorderLayout.CENTER);
+
+        //total menu items per business
+        JLabel menuItemCountLabel = new JLabel("Total Menu Items Per Business");
+        menuItemCountLabel.setFont(new Font("Arial", Font.BOLD, 13));
+
+        String[] menuItemCountCols = {"Business Name", "Total Menu Items"};
+        menuItemCountModel = new DefaultTableModel(menuItemCountCols, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable menuItemCountTable = new JTable(menuItemCountModel);
+        menuItemCountTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JPanel menuItemCountPanel = new JPanel(new BorderLayout(5, 5));
+        menuItemCountPanel.add(menuItemCountLabel,                  BorderLayout.NORTH);
+        menuItemCountPanel.add(new JScrollPane(menuItemCountTable), BorderLayout.CENTER);
+
         //putting the tables in a grid
         JPanel tablesPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         tablesPanel.add(orderCountPanel);
         tablesPanel.add(revenuePanel);
         tablesPanel.add(avgPanel);
+        tablesPanel.add(deliveryCountPanel);
+        tablesPanel.add(menuItemCountPanel);
 
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> loadStats());
@@ -88,6 +122,8 @@ public class AdminStatsPanel extends JPanel {
         loadOrderCounts();
         loadRevenue();
         loadAvgOrderValues();
+        loadDeliveryCounts();
+        loadMenuItemCounts();
     }
 
     //load the amount of orders each customer has made
@@ -135,6 +171,38 @@ public class AdminStatsPanel extends JPanel {
             }
         } catch (SQLException e) {
             showError("Error loading avg order values: " + e.getMessage());
+        }
+    }
+
+    //load deliveries per driver
+    private void loadDeliveryCounts() {
+        deliveryCountModel.setRowCount(0);
+        try {
+            ResultSet rs = orderDAO.getDeliveryCountPerDriver();
+            while (rs.next()) {
+                deliveryCountModel.addRow(new Object[]{
+                    rs.getString("driver_name"),
+                    rs.getInt("total_deliveries")
+                });
+            }
+        } catch (SQLException e) {
+            showError("Error loading delivery counts: " + e.getMessage());
+        }
+    }
+
+    //load total menu items per business
+    private void loadMenuItemCounts() {
+        menuItemCountModel.setRowCount(0);
+        try {
+            ResultSet rs = orderDAO.getMenuItemCountPerBusiness();
+            while (rs.next()) {
+                menuItemCountModel.addRow(new Object[]{
+                    rs.getString("business_name"),
+                    rs.getInt("total_items")
+                });
+            }
+        } catch (SQLException e) {
+            showError("Error loading menu item counts: " + e.getMessage());
         }
     }
 
