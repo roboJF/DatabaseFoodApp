@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LoginPanel extends JPanel {
-
+    // asks user to login, determines user account type
     public LoginPanel(MainFrame mainFrame){
 
         setLayout(new GridBagLayout());

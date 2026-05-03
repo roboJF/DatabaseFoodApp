@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CreateAccountPanel extends JPanel {
-
+    // this allows new users to create different categories of new accounts
     public CreateAccountPanel(MainFrame mainFrame){
 
         setLayout(new GridBagLayout());

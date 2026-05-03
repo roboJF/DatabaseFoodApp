@@ -7,7 +7,9 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class SQLLoginPanel extends JPanel {
-
+    // asks user for database login
+    // default username: root
+    // default password: password
     public SQLLoginPanel(MainFrame mainFrame) {
         setLayout(new GridBagLayout());
 
@@ -51,11 +53,6 @@ public class SQLLoginPanel extends JPanel {
                         "Could not connect to database.\n\n" + ex.getMessage(),
                         "Connection Error",
                         JOptionPane.ERROR_MESSAGE
-                // JOptionPane.showMessageDialog(
-                // this,
-                // "Could not connect to database.\nCheck your MySQL username and password.",
-                // "Connection Error",
-                // JOptionPane.ERROR_MESSAGE
                 );
             }
         });

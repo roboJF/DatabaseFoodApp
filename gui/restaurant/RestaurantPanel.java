@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RestaurantPanel extends JPanel {
-
+    // panel for the restaurant business entity
     private int restaurantId;
     private MainFrame mainFrame;
 

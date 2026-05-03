@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CreateAdminPanel extends JPanel {
-
+    // creates new admin entities
     public CreateAdminPanel(MainFrame mainFrame){
 
         setLayout(new GridBagLayout());

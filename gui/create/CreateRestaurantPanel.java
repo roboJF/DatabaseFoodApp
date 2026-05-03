@@ -9,7 +9,7 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 
 public class CreateRestaurantPanel extends JPanel {
-
+    // creates new restaurant entities
     public CreateRestaurantPanel(MainFrame mainFrame){
 
         setLayout(new GridBagLayout());

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantMenuPanel extends JPanel {
-
+    // restaurant can view, edit menu items
     private int restaurantId;
 
     private JTable availableTable;
@@ -45,8 +45,7 @@ public class RestaurantMenuPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,
                 availablePanel,
-                unavailablePanel
-        );
+                unavailablePanel);
 
         splitPane.setResizeWeight(0.5);
 
@@ -56,9 +55,8 @@ public class RestaurantMenuPanel extends JPanel {
     // build table model
     private DefaultTableModel buildModel() {
         return new DefaultTableModel(
-                new String[]{"Item", "Description", "Price"},
-                0
-        ) {
+                new String[] { "Item", "Description", "Price" },
+                0) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -132,7 +130,7 @@ public class RestaurantMenuPanel extends JPanel {
             unavailableModel.setRowCount(0);
 
             for (MenuItem item : allItems) {
-                Object[] row = new Object[]{
+                Object[] row = new Object[] {
                         item.getName(),
                         item.getDescription(),
                         String.format("$%.2f", item.getPrice())
@@ -184,8 +182,7 @@ public class RestaurantMenuPanel extends JPanel {
                 this,
                 fields,
                 "Add Menu Item",
-                JOptionPane.OK_CANCEL_OPTION
-        );
+                JOptionPane.OK_CANCEL_OPTION);
 
         if (result != JOptionPane.OK_OPTION) {
             return;
@@ -212,8 +209,7 @@ public class RestaurantMenuPanel extends JPanel {
                     description,
                     price,
                     true,
-                    restaurantId
-            );
+                    restaurantId);
 
             new MenuItemDAO().insert(item);
             loadMenuItems();
@@ -249,8 +245,7 @@ public class RestaurantMenuPanel extends JPanel {
                 this,
                 fields,
                 "Edit Menu Item",
-                JOptionPane.OK_CANCEL_OPTION
-        );
+                JOptionPane.OK_CANCEL_OPTION);
 
         if (result != JOptionPane.OK_OPTION) {
             return;
@@ -277,8 +272,7 @@ public class RestaurantMenuPanel extends JPanel {
                     description,
                     price,
                     selectedItem.isAvailable(),
-                    restaurantId
-            );
+                    restaurantId);
 
             new MenuItemDAO().update(updatedItem);
             loadMenuItems();

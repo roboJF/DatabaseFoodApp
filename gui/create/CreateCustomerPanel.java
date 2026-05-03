@@ -9,14 +9,14 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 
 public class CreateCustomerPanel extends JPanel {
-
-    public CreateCustomerPanel(MainFrame mainFrame){
+    // creates new customer entities
+    public CreateCustomerPanel(MainFrame mainFrame) {
 
         setLayout(new GridBagLayout());
 
         // form panel
-        JPanel formPanel = new JPanel(new GridLayout(8,2,10,10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        JPanel formPanel = new JPanel(new GridLayout(8, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // input fields
         // first name
@@ -36,11 +36,11 @@ public class CreateCustomerPanel extends JPanel {
         JFormattedTextField phoneField = new JFormattedTextField();
 
         // phone format mask
-        try{
+        try {
             MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
             phoneFormatter.setPlaceholderCharacter('_');
             phoneFormatter.install(phoneField);
-        } catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -103,34 +103,33 @@ public class CreateCustomerPanel extends JPanel {
             String password = new String(passwordField.getPassword());
 
             // check required fields
-            if(firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()){
+            if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please Fill Required Fields.");
                 return;
             }
 
             // check username across every account type
-            try{
-                if(usernameExists(username)){
+            try {
+                if (usernameExists(username)) {
                     JOptionPane.showMessageDialog(this, "Username Already Exists. Please Choose Another Username.");
                     return;
                 }
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error Checking Username.");
                 return;
             }
 
-            try{
+            try {
                 Customer customer = new Customer(
-                    0,
-                    firstName,
-                    lastName,
-                    address,
-                    phone,
-                    username,
-                    email,
-                    password
-                );
+                        0,
+                        firstName,
+                        lastName,
+                        address,
+                        phone,
+                        username,
+                        email,
+                        password);
 
                 // create new customer
                 new CustomerDAO().insert(customer);
@@ -138,7 +137,7 @@ public class CreateCustomerPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Customer Account Created.");
                 mainFrame.showLoginPanel();
 
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error Creating Customer Account.");
             }
@@ -148,9 +147,9 @@ public class CreateCustomerPanel extends JPanel {
     // checks if username already belongs to any account type
     private boolean usernameExists(String username) throws Exception {
         return new CustomerDAO().getByUsername(username) != null
-            || new FoodBusinessDAO().getByUsername(username) != null
-            || new DeliveryPersonnelDAO().getByUsername(username) != null
-            || new AdministratorDAO().getByUsername(username) != null;
+                || new FoodBusinessDAO().getByUsername(username) != null
+                || new DeliveryPersonnelDAO().getByUsername(username) != null
+                || new AdministratorDAO().getByUsername(username) != null;
     }
 
 }

@@ -16,7 +16,7 @@ import java.awt.*;
 import java.util.List;
 
 public class CustomerOrdersPanel extends JPanel {
-
+    // customer can see placed orders
     private int customerId;
 
     private JTable ordersTable;

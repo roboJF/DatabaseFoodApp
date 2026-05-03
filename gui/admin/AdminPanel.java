@@ -9,7 +9,7 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class AdminPanel extends JPanel {
-
+    // panel for the admin entity
     private MainFrame mainFrame;    // main app window
     private int adminId;    // id of the admin
 

@@ -7,8 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DriverInfoPanel extends JPanel {
+    // allow driver to view profile, edit fields, save changes, refresh
 
-    private int driverId;
+    private int driverId; // store drivers id
 
     private JTextField firstNameField;
     private JTextField lastNameField;
@@ -20,11 +21,12 @@ public class DriverInfoPanel extends JPanel {
     private JCheckBox showPasswordCheckBox;
 
     public DriverInfoPanel(int driverId) {
+        // constructor to build a panel for driver to view/edit their info
         this.driverId = driverId;
 
         setLayout(new GridBagLayout());
 
-        // form panel
+        // create 2 column form for the 8 input fields
         JPanel formPanel = new JPanel(new GridLayout(8, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -34,6 +36,7 @@ public class DriverInfoPanel extends JPanel {
         phoneField = new JTextField(15);
         vehicleField = new JTextField(15);
         usernameField = new JTextField(15);
+        // username is fixed and cannot be edited after account creation
         usernameField.setEditable(false);
         usernameField.setFocusable(false);
         emailField = new JTextField(15);
@@ -98,8 +101,9 @@ public class DriverInfoPanel extends JPanel {
         loadDriverInfo();
     }
 
-    // load driver info
+    // get driver info from db
     private void loadDriverInfo() {
+        // check if driver exists
         try {
             DeliveryPersonnel driver = new DeliveryPersonnelDAO().getById(driverId);
 
@@ -107,7 +111,7 @@ public class DriverInfoPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Driver not found.");
                 return;
             }
-
+            // populate form with current data
             firstNameField.setText(driver.getFirstName());
             lastNameField.setText(driver.getLastName());
             phoneField.setText(driver.getContactInfo());
@@ -122,7 +126,7 @@ public class DriverInfoPanel extends JPanel {
         }
     }
 
-    // save driver info
+    // save driver info to db
     private void saveDriverInfo() {
         String firstName = firstNameField.getText().trim();
         String lastName = lastNameField.getText().trim();
@@ -134,6 +138,7 @@ public class DriverInfoPanel extends JPanel {
 
         // check required fields
         if (firstName.isEmpty() || lastName.isEmpty()
+                || phone.isEmpty() || vehicle.isEmpty()
                 || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill required fields.");
             return;
@@ -148,8 +153,7 @@ public class DriverInfoPanel extends JPanel {
                     vehicle,
                     username,
                     email,
-                    password
-            );
+                    password);
 
             // update driver in database
             new DeliveryPersonnelDAO().update(updatedDriver);

@@ -10,7 +10,7 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
-
+    // main panel ui, multipurpose
     private CardLayout cardLayout;
     private JPanel mainPanel;
 

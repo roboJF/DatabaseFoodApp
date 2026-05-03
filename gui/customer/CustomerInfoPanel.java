@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CustomerInfoPanel extends JPanel {
-
+    // customer can view, edit, update their info
     private int customerId;
 
     private JTextField firstNameField;
@@ -34,6 +34,7 @@ public class CustomerInfoPanel extends JPanel {
         addressField = new JTextField(15);
         phoneField = new JTextField(15);
         usernameField = new JTextField(15);
+        // username is fixed and cannot be edited after account creation
         usernameField.setEditable(false);
         usernameField.setFocusable(false);
         emailField = new JTextField(15);
@@ -134,6 +135,7 @@ public class CustomerInfoPanel extends JPanel {
 
         // check required fields, makes sure there are no empty fields
         if (firstName.isEmpty() || lastName.isEmpty() || address.isEmpty()
+                || phone.isEmpty()
                 || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill required fields.");
             return;
@@ -149,9 +151,8 @@ public class CustomerInfoPanel extends JPanel {
                     phone,
                     username,
                     email,
-                    password
-            );
-            
+                    password);
+
             // update existing customer in database
             new CustomerDAO().update(updatedCustomer);
 

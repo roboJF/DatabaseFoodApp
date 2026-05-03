@@ -9,7 +9,7 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 
 public class CreateDriverPanel extends JPanel {
-
+    // creates new driver entities
     public CreateDriverPanel(MainFrame mainFrame){
 
         setLayout(new GridBagLayout());

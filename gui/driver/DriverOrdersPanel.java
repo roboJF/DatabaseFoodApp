@@ -13,13 +13,15 @@ import java.awt.*;
 import java.util.List;
 
 public class DriverOrdersPanel extends JPanel {
-
+    // driver can view available orders, active orders, delivered orders
+    // flow: READY-> ASSIGNED -> OUT_FOR_DELIVERY -> DELIVERED
     private int driverId;
 
     private JTable availableTable;
     private JTable activeTable;
     private JTable deliveredTable;
 
+    // separate tables for each category
     private DefaultTableModel availableModel;
     private DefaultTableModel activeModel;
     private DefaultTableModel deliveredModel;
@@ -33,10 +35,12 @@ public class DriverOrdersPanel extends JPanel {
         loadOrders();
     }
 
-    // build panel
     private void buildPanel() {
+        // available orders top
         availableModel = buildOrderModel();
+        // active orders middle
         activeModel = buildOrderModel();
+        // delivered orders bottom
         deliveredModel = buildOrderModel();
 
         availableTable = new JTable(availableModel);
@@ -47,8 +51,11 @@ public class DriverOrdersPanel extends JPanel {
         applyStatusRenderer(activeTable);
         applyStatusRenderer(deliveredTable);
 
+        // section for unassigned orders driver can choose to take
         JPanel availablePanel = buildAvailablePanel();
+        // section for orders assigned to driver not yet delivered
         JPanel activePanel = buildActivePanel();
+        // section for completed deliveries
         JPanel deliveredPanel = buildDeliveredPanel();
 
         JSplitPane lowerSplit = new JSplitPane(
@@ -135,10 +142,10 @@ public class DriverOrdersPanel extends JPanel {
         return panel;
     }
 
-    // build table model
+    // shared table model so all order tables use the same columns
     private DefaultTableModel buildOrderModel() {
         return new DefaultTableModel(
-                new String[]{
+                new String[] {
                         "Order ID",
                         "Restaurant",
                         "Restaurant Location",
@@ -153,7 +160,7 @@ public class DriverOrdersPanel extends JPanel {
         };
     }
 
-    // display formatted status while keeping raw status in table model
+    // display readable status text while keeping raw database status intact
     private void applyStatusRenderer(JTable table) {
         table.getColumnModel().getColumn(5).setCellRenderer((tbl, value, isSelected, hasFocus, row, column) -> {
             JLabel label = new JLabel(formatStatus(value == null ? "" : value.toString()));
@@ -172,7 +179,8 @@ public class DriverOrdersPanel extends JPanel {
         });
     }
 
-    // format the status string displayed to user
+    // format the status string displayed to user,
+    // ex converts status OUT_FOR_DELIVERY into Out for Delivery
     private String formatStatus(String status) {
         if (status == null) {
             return "";
@@ -202,6 +210,7 @@ public class DriverOrdersPanel extends JPanel {
     // load orders
     private void loadOrders() {
         try {
+            // clear old rows before reloading fresh data
             availableModel.setRowCount(0);
             activeModel.setRowCount(0);
             deliveredModel.setRowCount(0);
@@ -210,7 +219,9 @@ public class DriverOrdersPanel extends JPanel {
             FoodBusinessDAO businessDAO = new FoodBusinessDAO();
             CustomerDAO customerDAO = new CustomerDAO();
 
+            // available orders are unassigned
             List<FoodOrder> availableOrders = orderDAO.getUnassignedOrders();
+            // myorders are assigned to this driver
             List<FoodOrder> myOrders = orderDAO.getByDeliveryPersonnel(driverId);
 
             for (FoodOrder order : availableOrders) {
@@ -231,14 +242,14 @@ public class DriverOrdersPanel extends JPanel {
         }
     }
 
-    // add order row
+    // add new order row
     private void addOrderRow(DefaultTableModel model, FoodOrder order,
             FoodBusinessDAO businessDAO, CustomerDAO customerDAO) throws Exception {
 
         FoodBusiness business = businessDAO.getById(order.getFoodBusinessId());
         Customer customer = customerDAO.getById(order.getCustomerId());
 
-        model.addRow(new Object[]{
+        model.addRow(new Object[] {
                 order.getFoodOrderId(),
                 business != null ? business.getName() : "Unknown",
                 business != null ? business.getLocation() : "Unknown",
@@ -248,7 +259,7 @@ public class DriverOrdersPanel extends JPanel {
         });
     }
 
-    // take order
+    // take available order, makes it assigned to driver
     private void takeOrder() {
         int row = availableTable.getSelectedRow();
 

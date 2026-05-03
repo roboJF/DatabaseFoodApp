@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantOrdersPanel extends JPanel {
-
+    // restaurant can mark order status for customer and driver's view
+    // flow: PENDING -> PREPARING -> READY
     private int restaurantId;
 
     private JTable orderTable;
@@ -60,24 +61,29 @@ public class RestaurantOrdersPanel extends JPanel {
         orderTable.getColumnModel().getColumn(5).setPreferredWidth(70); // Driver ID
         orderTable.getColumnModel().getColumn(6).setPreferredWidth(130); // Delivery Driver
         orderTable.getColumnModel().getColumn(7).setPreferredWidth(160); // Status
+
+        // allow restaurant to set order status for customer and driver's view
         JButton pendingButton = new JButton("Mark Pending");
+        JButton preparingButton = new JButton("Mark Preparing");
         JButton readyButton = new JButton("Mark Ready for Pickup");
         JButton refreshButton = new JButton("Refresh Orders");
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(pendingButton);
+        buttonPanel.add(preparingButton);
         buttonPanel.add(readyButton);
         buttonPanel.add(refreshButton);
 
         add(new JScrollPane(orderTable), BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
+        preparingButton.addActionListener(e -> updateSelectedOrderStatus("PREPARING"));
         pendingButton.addActionListener(e -> updateSelectedOrderStatus("PENDING"));
         readyButton.addActionListener(e -> updateSelectedOrderStatus("READY"));
         refreshButton.addActionListener(e -> loadOrders());
     }
 
-    // load orders
+    // gets list of orders
     private void loadOrders() {
         try {
             orderList = new FoodOrderDAO().getByBusiness(restaurantId);
@@ -136,7 +142,7 @@ public class RestaurantOrdersPanel extends JPanel {
         return result.toString();
     }
 
-    // update selected order status (RESTRICTED)
+    // update selected order status
     private void updateSelectedOrderStatus(String status) {
         int row = orderTable.getSelectedRow();
 
@@ -149,10 +155,30 @@ public class RestaurantOrdersPanel extends JPanel {
         String currentStatus = selectedOrder.getOrderStatus();
 
         // Only allow changes if still in restaurant control
-        if (!currentStatus.equals("PENDING") && !currentStatus.equals("READY")) {
+        if (!currentStatus.equals("PENDING")
+                && !currentStatus.equals("PREPARING")
+                && !currentStatus.equals("READY")) {
             JOptionPane.showMessageDialog(
                     this,
                     "This order has already been claimed by a driver.\nThe restaurant can no longer change its status.");
+            return;
+        }
+
+        // enforce restaurant order flow, but can change for status mistake
+        if (status.equals("PREPARING")
+                && !currentStatus.equals("PENDING")
+                && !currentStatus.equals("READY")) {
+            JOptionPane.showMessageDialog(this, "Order must be pending or ready before it can be marked preparing.");
+            return;
+        }
+
+        if (status.equals("READY") && !currentStatus.equals("PREPARING")) {
+            JOptionPane.showMessageDialog(this, "Order must be preparing before it can be marked ready.");
+            return;
+        }
+
+        if (status.equals("PENDING") && !currentStatus.equals("PREPARING")) {
+            JOptionPane.showMessageDialog(this, "Only preparing orders can be moved back to pending.");
             return;
         }
 

@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RestaurantInfoPanel extends JPanel {
-
+    // restaurant can view, edit their info
     private int restaurantId;
 
     private JTextField nameField;
@@ -32,6 +32,7 @@ public class RestaurantInfoPanel extends JPanel {
         locationField = new JTextField(15);
         phoneField = new JTextField(15);
         usernameField = new JTextField(15);
+        // username is fixed and cannot be edited after account creation
         usernameField.setEditable(false);
         usernameField.setFocusable(false);
 
@@ -126,8 +127,8 @@ public class RestaurantInfoPanel extends JPanel {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
 
-        // check required fields
-        if (name.isEmpty() || location.isEmpty()
+        // check required fields nonempty
+        if (name.isEmpty() || location.isEmpty() || phone.isEmpty()
                 || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill required fields.");
             return;
@@ -141,8 +142,7 @@ public class RestaurantInfoPanel extends JPanel {
                     phone,
                     username,
                     email,
-                    password
-            );
+                    password);
 
             // update existing restaurant in database
             new FoodBusinessDAO().update(updatedRestaurant);

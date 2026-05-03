@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CustomerPanel extends JPanel {
-
+    // panel for the customer entity
     private int customerId;
     private MainFrame mainFrame;
 

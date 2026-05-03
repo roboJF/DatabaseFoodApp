@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DriverPanel extends JPanel {
-
+    // panel for the delivery driver entity
     private int driverId;
     private MainFrame mainFrame;
 
