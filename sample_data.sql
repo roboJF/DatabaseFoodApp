@@ -21,15 +21,15 @@ INSERT INTO administrator (username, email, password) VALUES
 ('admin3', 'admin3@email.com', 'password');
 
 INSERT INTO menu_item (name, description, price, availability, food_business_id) VALUES
-('Cheese Pizza', 'Processed cheese and tomato sauce', 5.99, TRUE, 1),
-('Pepperoni Pizza', 'Human grade sausage, cheese, tomato sauce', 6.99, TRUE, 1),
-('Gabagool Pizza', 'Gabagool with cheese', 7.99, TRUE, 1),
+('Cheese Pizza', 'Processed cheese, tomato sauce', 5.99, TRUE, 1),
+('Pepperoni Pizza', 'Human grade meat disks, cheese, tomato sauce', 6.99, TRUE, 1),
+('Gabagool Pizza', 'Gabagool, cheese, fugeddaboutit', 7.99, TRUE, 1),
 ('Classic Burger', 'Dead cow, lettuce, tomato', 8.99, TRUE, 2),
-('Cheese Burger', 'Dead cow with american cheese', 9.99, TRUE, 2),
-('BLT Burger', 'Dead cow with dead pig, lettuce, tomato', 10.99, TRUE, 2),
-('Crunchy Taco', 'Dead cow, lettuce, and shredded cheese', 4.99, TRUE, 3),
+('Cheese Burger', 'Dead cow, processed cheese', 9.99, TRUE, 2),
+('BLT Burger', 'Ground up dead cow with salt cured dead pig, lettuce, tomato', 10.99, TRUE, 2),
+('Crunchy Taco', 'Ground up dead cow, lettuce, and shredded cheese', 4.99, TRUE, 3),
 ('Soft Taco', 'Shredded dead pig, cheese, lettuce, tomato', 3.99, TRUE, 3),
-('Fajita Quesadilla', 'Cheese, onions, roasted peppers', 5.99, TRUE, 3);
+('Fajita Quesadilla', 'Processed cheese, onions, roasted peppers', 5.99, TRUE, 3);
 
 INSERT INTO food_order (order_status, customer_id, food_business_id, delivery_personnel_id) VALUES
 ('PENDING', 1, 1, NULL),
