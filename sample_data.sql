@@ -23,7 +23,7 @@ INSERT INTO administrator (username, email, password) VALUES
 INSERT INTO menu_item (name, description, price, availability, food_business_id) VALUES
 ('Cheese Pizza', 'Processed cheese, tomato sauce', 5.99, TRUE, 1),
 ('Pepperoni Pizza', 'Human grade meat disks, cheese, tomato sauce', 6.99, TRUE, 1),
-('Gabagool Pizza', 'Gabagool, cheese, fugeddaboutit', 7.99, TRUE, 1),
+('Gabagool Pizza', 'Gabagool, cheese, fuhgeddaboutit', 7.99, TRUE, 1),
 ('Classic Burger', 'Dead cow, lettuce, tomato', 8.99, TRUE, 2),
 ('Cheese Burger', 'Dead cow, processed cheese', 9.99, TRUE, 2),
 ('BLT Burger', 'Ground up dead cow with salt cured dead pig, lettuce, tomato', 10.99, TRUE, 2),
