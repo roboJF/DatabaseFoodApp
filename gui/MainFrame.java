@@ -16,7 +16,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         setTitle("Foodie - Your Food Delivery App");
-        setSize(900, 600);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
