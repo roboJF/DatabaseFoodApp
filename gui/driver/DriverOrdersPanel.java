@@ -280,7 +280,7 @@ public class DriverOrdersPanel extends JPanel {
         }
     }
 
-    // unassign order
+    // allow driver to unassign order so others can take it
     private void unassignOrder() {
         int row = activeTable.getSelectedRow();
 
@@ -290,6 +290,12 @@ public class DriverOrdersPanel extends JPanel {
         }
 
         int orderId = (int) activeModel.getValueAt(row, 0);
+        String status = (String) activeModel.getValueAt(row, 5);
+        // guard: only allow unassign before pickup
+        if (!status.equals("ASSIGNED")) {
+            JOptionPane.showMessageDialog(this, "Order cannot be unassigned after pickup.");
+            return;
+        }
 
         int confirm = JOptionPane.showConfirmDialog(
                 this,
@@ -312,7 +318,7 @@ public class DriverOrdersPanel extends JPanel {
         }
     }
 
-    // mark picked up
+    // mark that driver picked up order
     private void markPickedUp() {
         int row = activeTable.getSelectedRow();
 
@@ -339,7 +345,7 @@ public class DriverOrdersPanel extends JPanel {
         }
     }
 
-    // mark delivered
+    // mark the order as delivered
     private void markDelivered() {
         int row = activeTable.getSelectedRow();
 

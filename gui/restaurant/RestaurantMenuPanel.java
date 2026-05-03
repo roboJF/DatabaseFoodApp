@@ -18,7 +18,7 @@ public class RestaurantMenuPanel extends JPanel {
 
     private DefaultTableModel availableModel;
     private DefaultTableModel unavailableModel;
-
+    // store items separately so selection maps back to correct menuitem
     private List<MenuItem> availableItems = new ArrayList<>();
     private List<MenuItem> unavailableItems = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class RestaurantMenuPanel extends JPanel {
         loadMenuItems();
     }
 
-    // build panel
+    // builds panel layout with available, unavailable menu items
     private void buildPanel() {
         availableModel = buildModel();
         unavailableModel = buildModel();
@@ -52,7 +52,7 @@ public class RestaurantMenuPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    // build table model
+    // create table model shared by both tables
     private DefaultTableModel buildModel() {
         return new DefaultTableModel(
                 new String[] { "Item", "Description", "Price" },
@@ -63,7 +63,7 @@ public class RestaurantMenuPanel extends JPanel {
         };
     }
 
-    // build available panel
+    // panel showing available items, customer can order these
     private JPanel buildAvailablePanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
 
@@ -92,7 +92,7 @@ public class RestaurantMenuPanel extends JPanel {
         return panel;
     }
 
-    // build unavailable panel
+    // panel showing unavailable items, customer cant order these
     private JPanel buildUnavailablePanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
 
@@ -118,7 +118,7 @@ public class RestaurantMenuPanel extends JPanel {
         return panel;
     }
 
-    // load menu items
+    // fetch menu items from database and split into available/unavailable tables
     private void loadMenuItems() {
         try {
             List<MenuItem> allItems = new MenuItemDAO().getByBusiness(restaurantId);
@@ -135,7 +135,7 @@ public class RestaurantMenuPanel extends JPanel {
                         item.getDescription(),
                         String.format("$%.2f", item.getPrice())
                 };
-
+                // separate items based on availability flag
                 if (item.isAvailable()) {
                     availableItems.add(item);
                     availableModel.addRow(row);
@@ -151,7 +151,7 @@ public class RestaurantMenuPanel extends JPanel {
         }
     }
 
-    // get selected item
+    // return selected menu item based on which table was clicked
     private MenuItem getSelectedItem(JTable table) {
         int row = table.getSelectedRow();
 
@@ -166,7 +166,7 @@ public class RestaurantMenuPanel extends JPanel {
         return unavailableItems.get(row);
     }
 
-    // add menu item
+    // prompt user for new item info, validate input, insert into database
     private void addMenuItem() {
         JTextField nameField = new JTextField();
         JTextField descriptionField = new JTextField();
@@ -187,7 +187,7 @@ public class RestaurantMenuPanel extends JPanel {
         if (result != JOptionPane.OK_OPTION) {
             return;
         }
-
+        // validate fields
         try {
             String name = nameField.getText().trim();
             String description = descriptionField.getText().trim();
@@ -222,7 +222,7 @@ public class RestaurantMenuPanel extends JPanel {
         }
     }
 
-    // edit selected menu item
+    // edit existing menu items
     private void editSelectedMenuItem(JTable table) {
         MenuItem selectedItem = getSelectedItem(table);
 
@@ -285,7 +285,8 @@ public class RestaurantMenuPanel extends JPanel {
         }
     }
 
-    // update availability
+    // toggle availability of selected item and refresh tables so menu items can be
+    // removed gracefully
     private void updateAvailability(boolean available, JTable table) {
         MenuItem selectedItem = getSelectedItem(table);
 

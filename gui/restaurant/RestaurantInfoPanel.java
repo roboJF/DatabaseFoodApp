@@ -27,7 +27,7 @@ public class RestaurantInfoPanel extends JPanel {
         JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // input fields
+        // input fields for restaurant profile data
         nameField = new JTextField(15);
         locationField = new JTextField(15);
         phoneField = new JTextField(15);
@@ -48,7 +48,7 @@ public class RestaurantInfoPanel extends JPanel {
         JButton saveButton = new JButton("Save Changes");
         JButton refreshButton = new JButton("Refresh");
 
-        // form layout
+        // create form layout for editing restaurant information
         formPanel.add(new JLabel("Restaurant Name:"));
         formPanel.add(nameField);
 
@@ -66,7 +66,7 @@ public class RestaurantInfoPanel extends JPanel {
 
         formPanel.add(new JLabel("Password:"));
 
-        // password panel
+        // password field with toggle to show/hide characters
         JPanel passwordPanel = new JPanel(new BorderLayout(5, 0));
         passwordPanel.add(passwordField, BorderLayout.CENTER);
         passwordPanel.add(showPasswordCheckBox, BorderLayout.EAST);
@@ -91,11 +91,11 @@ public class RestaurantInfoPanel extends JPanel {
         // button actions
         refreshButton.addActionListener(e -> loadRestaurantInfo());
         saveButton.addActionListener(e -> saveRestaurantInfo());
-
+        // reload data to show latest
         loadRestaurantInfo();
     }
 
-    // load restaurant info
+    // get restaurant info from db, populate form
     private void loadRestaurantInfo() {
         try {
             FoodBusiness restaurant = new FoodBusinessDAO().getById(restaurantId);
@@ -118,7 +118,7 @@ public class RestaurantInfoPanel extends JPanel {
         }
     }
 
-    // save restaurant info
+    // validate input, update restaurant info in db
     private void saveRestaurantInfo() {
         String name = nameField.getText().trim();
         String location = locationField.getText().trim();
@@ -148,7 +148,8 @@ public class RestaurantInfoPanel extends JPanel {
             new FoodBusinessDAO().update(updatedRestaurant);
 
             JOptionPane.showMessageDialog(this, "Restaurant info updated.");
-
+            // refresh to show latest data after save
+            loadRestaurantInfo();
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error updating restaurant info.");

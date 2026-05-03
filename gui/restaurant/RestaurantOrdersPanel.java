@@ -14,11 +14,13 @@ import java.util.List;
 public class RestaurantOrdersPanel extends JPanel {
     // restaurant can mark order status for customer and driver's view
     // flow: PENDING -> PREPARING -> READY
+    // once driver assigned, restaurant cant modify order
     private int restaurantId;
 
     private JTable orderTable;
     private DefaultTableModel orderModel;
 
+    // store order in same order as table rows
     private List<FoodOrder> orderList = new ArrayList<>();
 
     public RestaurantOrdersPanel(int restaurantId) {
@@ -30,7 +32,7 @@ public class RestaurantOrdersPanel extends JPanel {
         loadOrders();
     }
 
-    // build panel
+    // build main table and action buttons for managing order statuses
     private void buildPanel() {
         orderModel = new DefaultTableModel(
                 new String[] {
@@ -83,7 +85,7 @@ public class RestaurantOrdersPanel extends JPanel {
         refreshButton.addActionListener(e -> loadOrders());
     }
 
-    // gets list of orders
+    // gets list of orders for this restaurant, populate table
     private void loadOrders() {
         try {
             orderList = new FoodOrderDAO().getByBusiness(restaurantId);
@@ -100,6 +102,7 @@ public class RestaurantOrdersPanel extends JPanel {
                 Customer customer = customerDAO.getById(order.getCustomerId());
                 String customerName = customer != null ? customer.getFullName() : "Unknown";
 
+                // put order, customer, driver infos on row
                 orderModel.addRow(new Object[] {
                         order.getFoodOrderId(),
                         order.getCustomerId(),
@@ -122,7 +125,7 @@ public class RestaurantOrdersPanel extends JPanel {
     private String formatStatus(String status) {
         if (status == null)
             return "";
-
+        // make it more readable
         String[] words = status.toLowerCase().split("_");
         StringBuilder result = new StringBuilder();
 
@@ -154,7 +157,8 @@ public class RestaurantOrdersPanel extends JPanel {
         FoodOrder selectedOrder = orderList.get(row);
         String currentStatus = selectedOrder.getOrderStatus();
 
-        // Only allow changes if still in restaurant control
+        // only allow changes if still in restaurant control
+        // cant change after driver assigned
         if (!currentStatus.equals("PENDING")
                 && !currentStatus.equals("PREPARING")
                 && !currentStatus.equals("READY")) {
