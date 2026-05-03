@@ -48,7 +48,7 @@ public class CustomerInfoPanel extends JPanel {
         JButton saveButton = new JButton("Save Changes");
         JButton refreshButton = new JButton("Refresh");
 
-        // form layout
+        // form fields layout
         formPanel.add(new JLabel("First Name:"));
         formPanel.add(firstNameField);
 
@@ -98,7 +98,7 @@ public class CustomerInfoPanel extends JPanel {
         loadCustomerInfo();
     }
 
-    // load customer info
+    // load the customers info
     private void loadCustomerInfo() {
         try {
             Customer customer = new CustomerDAO().getById(customerId);
@@ -122,7 +122,7 @@ public class CustomerInfoPanel extends JPanel {
         }
     }
 
-    // save customer info
+    // clean, validate, and save updates to customer info
     private void saveCustomerInfo() {
         String firstName = firstNameField.getText().trim();
         String lastName = lastNameField.getText().trim();
@@ -132,7 +132,7 @@ public class CustomerInfoPanel extends JPanel {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
 
-        // check required fields
+        // check required fields, makes sure there are no empty fields
         if (firstName.isEmpty() || lastName.isEmpty() || address.isEmpty()
                 || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill required fields.");

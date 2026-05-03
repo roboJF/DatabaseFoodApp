@@ -18,8 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerBrowsePanel extends JPanel {
-
+    // customer can browse, select restaurant, view menu,
+    // add items, edit qty, remove items, place order
     private int customerId;
+
+    // stores a callback for the order, run it once the order is placed
     private Runnable onOrderPlaced;
 
     private JTable restaurantTable;
@@ -27,6 +30,7 @@ public class CustomerBrowsePanel extends JPanel {
     private JTable cartTable;
     private JLabel totalLabel;
 
+    // tables for restaurant, menu, cart
     private DefaultTableModel restaurantModel;
     private DefaultTableModel menuModel;
     private DefaultTableModel cartModel;
@@ -39,9 +43,10 @@ public class CustomerBrowsePanel extends JPanel {
 
     private JTextField addQuantityField;
 
+    // constructor for the panel to browse restaurants, menus
     public CustomerBrowsePanel(int customerId, Runnable onOrderPlaced) {
-        this.customerId = customerId;
-        this.onOrderPlaced = onOrderPlaced;
+        this.customerId = customerId; // customer's id
+        this.onOrderPlaced = onOrderPlaced; // the runnable after order placed
 
         setLayout(new BorderLayout(10, 10));
 
@@ -72,6 +77,7 @@ public class CustomerBrowsePanel extends JPanel {
         menuTable = new JTable(menuModel);
         cartTable = new JTable(cartModel);
 
+        // can only select one at a time
         restaurantTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         menuTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         cartTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -91,6 +97,7 @@ public class CustomerBrowsePanel extends JPanel {
         addQuantityField = new JTextField("1", 4);
         JButton addToCartButton = new JButton("Add to Cart");
 
+        // specify item quantity
         addToCartPanel.add(new JLabel("Quantity:"));
         addToCartPanel.add(addQuantityField);
         addToCartPanel.add(addToCartButton);
@@ -112,6 +119,7 @@ public class CustomerBrowsePanel extends JPanel {
         JButton removeButton = new JButton("Remove Selected");
         JButton placeOrderButton = new JButton("Place Order");
 
+        // remove or place order
         cartButtonPanel.add(removeButton);
         cartButtonPanel.add(placeOrderButton);
 
@@ -119,6 +127,7 @@ public class CustomerBrowsePanel extends JPanel {
         totalLabel = new JLabel("Total: $0.00", SwingConstants.RIGHT);
         totalLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
+        // display total $
         JPanel totalPanel = new JPanel(new BorderLayout());
         totalPanel.add(totalLabel, BorderLayout.EAST);
 
@@ -144,6 +153,7 @@ public class CustomerBrowsePanel extends JPanel {
                 int newBusinessId = selected.getFoodBusinessId();
 
                 // clear cart if they choose a different restaurant
+                // makes sure customer can only order from one restaurant per order
                 if (!cartItems.isEmpty() && selectedBusinessId != -1 && newBusinessId != selectedBusinessId) {
                     int confirm = JOptionPane.showConfirmDialog(
                             this,
@@ -360,7 +370,7 @@ public class CustomerBrowsePanel extends JPanel {
             new OrderItemDAO().insertBatch(orderItems);
 
             JOptionPane.showMessageDialog(this, "Order placed.");
-            
+
             // reset the cart
             cartItems.clear();
             refreshCartTable();
@@ -369,7 +379,9 @@ public class CustomerBrowsePanel extends JPanel {
             restaurantTable.clearSelection();
 
             if (onOrderPlaced != null) {
+                // run callback after placing order, refreshes orders panel in CustomerPanel
                 onOrderPlaced.run();
+
             }
 
         } catch (Exception ex) {

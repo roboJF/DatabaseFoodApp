@@ -21,14 +21,14 @@ public class CustomerPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // title label
+        // display title
         JLabel titleLabel = new JLabel("Customer Dashboard");
         loadCustomerName(titleLabel);
 
         // logout button
         JButton logoutButton = new JButton("Logout");
 
-        // top panel
+        // top panel with dashboard title and logout btn
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(titleLabel, BorderLayout.WEST);
         topPanel.add(logoutButton, BorderLayout.EAST);
@@ -36,15 +36,19 @@ public class CustomerPanel extends JPanel {
         // orders panel
         ordersPanel = new CustomerOrdersPanel(customerId);
 
-        // browse panel
-        CustomerBrowsePanel browsePanel = new CustomerBrowsePanel(customerId, () -> {
-            ordersPanel.loadOrders();
+        // browse panel, pass callback to refresh orders after placing an order
+        CustomerBrowsePanel browsePanel = new CustomerBrowsePanel(customerId, new Runnable() {
+            @Override // override existing run()
+            public void run() {
+                // refresh orders panel after placing an order
+                ordersPanel.loadOrders();
+            }
         });
 
         // info panel
         CustomerInfoPanel infoPanel = new CustomerInfoPanel(customerId);
 
-        // tabbed pane
+        // tabbed panes
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Browse Restaurants", browsePanel);
         tabs.addTab("My Orders", ordersPanel);
@@ -54,7 +58,7 @@ public class CustomerPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
 
-        // logout action
+        // logout action for button
         logoutButton.addActionListener(e -> {
             mainFrame.showLoginPanel();
         });
