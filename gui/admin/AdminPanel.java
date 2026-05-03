@@ -10,11 +10,12 @@ import java.sql.SQLException;
 
 public class AdminPanel extends JPanel {
 
-    private MainFrame mainFrame;
-    private int adminId;
+    private MainFrame mainFrame;    // main app window
+    private int adminId;    // id of the admin
 
-    private AdministratorDAO adminDAO = new AdministratorDAO();
+    private AdministratorDAO adminDAO = new AdministratorDAO(); // admin's data access object
 
+    // panel constructor
     public AdminPanel(MainFrame mainFrame, int adminId) {
         this.mainFrame = mainFrame;
         this.adminId = adminId;
@@ -25,13 +26,17 @@ public class AdminPanel extends JPanel {
         add(buildTabs(), BorderLayout.CENTER);
     }
 
+    // top ui pane
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout());
+        // add some spacing
         header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // title
         JLabel title = new JLabel("Admin Dashboard");
         title.setFont(new Font("Arial", Font.BOLD, 18));
-
+        
+        // show current admin's userid
         JLabel welcomeLabel = new JLabel("  Logged in as: " + getAdminUsername());
 
         JButton logoutButton = new JButton("Logout");
@@ -40,7 +45,7 @@ public class AdminPanel extends JPanel {
         header.add(welcomeLabel, BorderLayout.CENTER);
         header.add(logoutButton, BorderLayout.EAST);
 
-        // logout action
+        // logout back to main login screen
         logoutButton.addActionListener(e -> {
             mainFrame.showLoginPanel();
         });
@@ -48,6 +53,7 @@ public class AdminPanel extends JPanel {
         return header;
     }
 
+    // builds set of tabs for admin subpanels
     private JTabbedPane buildTabs() {
         JTabbedPane tabs = new JTabbedPane();
 
@@ -60,7 +66,7 @@ public class AdminPanel extends JPanel {
         return tabs;
     }
 
-    // get logged in admin username
+    // get current logged in admin username
     private String getAdminUsername() {
         try {
             Administrator admin = adminDAO.getById(adminId);

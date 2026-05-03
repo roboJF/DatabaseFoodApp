@@ -10,9 +10,10 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class AdminDriverPanel extends JPanel {
-
+    // the admin will manage drivers through this panel
     private int adminId;
 
+    // data access objects
     private DeliveryPersonnelDAO deliveryDAO = new DeliveryPersonnelDAO();
     private AdminManagesDAO managesDAO = new AdminManagesDAO();
 
@@ -29,9 +30,9 @@ public class AdminDriverPanel extends JPanel {
         loadDelivery();
     }
 
-    // build panel
+    // build panel, table, buttons
     private void buildPanel() {
-        String[] cols = {"ID", "First Name", "Last Name", "Contact", "Vehicle", "Username", "Email"};
+        String[] cols = { "ID", "First Name", "Last Name", "Contact", "Vehicle", "Username", "Email" };
 
         deliveryModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) {
@@ -39,9 +40,11 @@ public class AdminDriverPanel extends JPanel {
             }
         };
 
+        // table
         deliveryTable = new JTable(deliveryModel);
         deliveryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        // buttons
         JButton registerButton = new JButton("Register Personnel");
         JButton editButton = new JButton("Edit Selected");
         JButton deleteButton = new JButton("Delete Selected");
@@ -69,7 +72,7 @@ public class AdminDriverPanel extends JPanel {
 
         try {
             for (DeliveryPersonnel driver : deliveryDAO.getAll()) {
-                deliveryModel.addRow(new Object[]{
+                deliveryModel.addRow(new Object[] {
                         driver.getDeliveryPersonnelId(),
                         driver.getFirstName(),
                         driver.getLastName(),
@@ -96,22 +99,36 @@ public class AdminDriverPanel extends JPanel {
         JPasswordField passwordField = new JPasswordField();
 
         JPanel form = buildForm(
-                new String[]{"First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email", "Password"},
-                new JComponent[]{firstNameField, lastNameField, contactField, vehicleField, usernameField, emailField, passwordField}
-        );
+                new String[] { "First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email",
+                        "Password" },
+                new JComponent[] { firstNameField, lastNameField, contactField, vehicleField, usernameField, emailField,
+                        passwordField });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
                 form,
                 "Register New Delivery Personnel",
                 JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
+                JOptionPane.PLAIN_MESSAGE);
 
+        // clean and validate input fields
         if (result == JOptionPane.OK_OPTION) {
             try {
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String contact = contactField.getText().trim();
+                String vehicle = vehicleField.getText().trim();
                 String username = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(firstName, lastName, contact, vehicle, username, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username uniqueness
                 if (deliveryDAO.getByUsername(username) != null) {
                     showError("Username already taken.");
                     return;
@@ -119,15 +136,15 @@ public class AdminDriverPanel extends JPanel {
 
                 deliveryDAO.insert(new DeliveryPersonnel(
                         0,
-                        firstNameField.getText().trim(),
-                        lastNameField.getText().trim(),
-                        contactField.getText().trim(),
-                        vehicleField.getText().trim(),
+                        firstName,
+                        lastName,
+                        contact,
+                        vehicle,
                         username,
-                        emailField.getText().trim(),
-                        new String(passwordField.getPassword())
-                ));
+                        email,
+                        password));
 
+                // link admin to this new delivery personnel
                 int newId = deliveryDAO.getByUsername(username).getDeliveryPersonnelId();
                 managesDAO.assignAdminToDelivery(adminId, newId);
 
@@ -168,21 +185,35 @@ public class AdminDriverPanel extends JPanel {
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
             JPanel form = buildForm(
-                    new String[]{"First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email", "Password"},
-                    new JComponent[]{firstNameField, lastNameField, contactField, vehicleField, usernameField, emailField, passwordField}
-            );
+                    new String[] { "First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email",
+                            "Password" },
+                    new JComponent[] { firstNameField, lastNameField, contactField, vehicleField, usernameField,
+                            emailField, passwordField });
 
             int result = JOptionPane.showConfirmDialog(
                     this,
                     form,
                     "Edit Delivery Personnel - " + existing.getFullName(),
                     JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE
-            );
+                    JOptionPane.PLAIN_MESSAGE);
 
+            // clean and validate updated values
             if (result == JOptionPane.OK_OPTION) {
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String contact = contactField.getText().trim();
+                String vehicle = vehicleField.getText().trim();
                 String newUsername = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(firstName, lastName, contact, vehicle, newUsername, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username if changed
                 if (!newUsername.equals(existing.getUsername())) {
                     if (deliveryDAO.getByUsername(newUsername) != null) {
                         showError("Username already taken.");
@@ -190,13 +221,13 @@ public class AdminDriverPanel extends JPanel {
                     }
                 }
 
-                existing.setFirstName(firstNameField.getText().trim());
-                existing.setLastName(lastNameField.getText().trim());
-                existing.setContactInfo(contactField.getText().trim());
-                existing.setVehicleDetails(vehicleField.getText().trim());
+                existing.setFirstName(firstName);
+                existing.setLastName(lastName);
+                existing.setContactInfo(contact);
+                existing.setVehicleDetails(vehicle);
                 existing.setUsername(newUsername);
-                existing.setEmail(emailField.getText().trim());
-                existing.setPassword(new String(passwordField.getPassword()));
+                existing.setEmail(email);
+                existing.setPassword(password);
 
                 deliveryDAO.update(existing);
 
@@ -213,7 +244,7 @@ public class AdminDriverPanel extends JPanel {
     private void deleteSelectedDelivery() {
         int row = deliveryTable.getSelectedRow();
 
-        if (row == -1) {
+        if (row == -1) { // if user didnt click a cell
             showError("Please select a delivery person to delete.");
             return;
         }
@@ -226,8 +257,7 @@ public class AdminDriverPanel extends JPanel {
                 "Are you sure you want to delete: " + name + "?",
                 "Confirm Delete",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
@@ -252,6 +282,16 @@ public class AdminDriverPanel extends JPanel {
         }
 
         return form;
+    }
+
+    // helper to check if any required field is empty
+    private boolean hasBlankFields(String... values) {
+        for (String value : values) {
+            if (value.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // show error

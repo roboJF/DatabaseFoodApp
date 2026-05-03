@@ -10,18 +10,21 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class AdminBusinessPanel extends JPanel {
+    // the admin will manage restaurants through this panel
+    private int adminId; // current admins id
 
-    private int adminId;
-
+    // data access objects
     private FoodBusinessDAO businessDAO = new FoodBusinessDAO();
     private AdminManagesDAO managesDAO = new AdminManagesDAO();
 
-    private JTable businessTable;
-    private DefaultTableModel businessModel;
+    private JTable businessTable; // visual table
+    private DefaultTableModel businessModel; // handle data in table
 
+    // panel constructor
     public AdminBusinessPanel(int adminId) {
         this.adminId = adminId;
 
+        // spacing and padding
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -29,9 +32,10 @@ public class AdminBusinessPanel extends JPanel {
         loadBusinesses();
     }
 
-    // build panel
+    // create table, buttons, actions
     private void buildPanel() {
-        String[] cols = {"ID", "Name", "Location", "Contact", "Username", "Email"};
+        // table columns
+        String[] cols = { "ID", "Name", "Location", "Contact", "Username", "Email" };
 
         businessModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) {
@@ -40,20 +44,21 @@ public class AdminBusinessPanel extends JPanel {
         };
 
         businessTable = new JTable(businessModel);
-        businessTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        businessTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // limit selection to single row
 
         JButton registerButton = new JButton("Register Business");
         JButton editButton = new JButton("Edit Selected");
         JButton deleteButton = new JButton("Delete Selected");
         JButton refreshButton = new JButton("Refresh");
 
+        // buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(registerButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(refreshButton);
 
-        add(new JScrollPane(businessTable), BorderLayout.CENTER);
+        add(new JScrollPane(businessTable), BorderLayout.CENTER); // scrollable list
         add(buttonPanel, BorderLayout.SOUTH);
 
         // button actions
@@ -63,13 +68,13 @@ public class AdminBusinessPanel extends JPanel {
         refreshButton.addActionListener(e -> loadBusinesses());
     }
 
-    // load businesses
+    // get the business accounts
     private void loadBusinesses() {
         businessModel.setRowCount(0);
-
+        // get the businesses to populate rows in the list
         try {
             for (FoodBusiness business : businessDAO.getAll()) {
-                businessModel.addRow(new Object[]{
+                businessModel.addRow(new Object[] {
                         business.getFoodBusinessId(),
                         business.getName(),
                         business.getLocation(),
@@ -84,7 +89,7 @@ public class AdminBusinessPanel extends JPanel {
         }
     }
 
-    // register business
+    // create new business account
     private void showRegisterBusinessDialog() {
         JTextField nameField = new JTextField();
         JTextField locationField = new JTextField();
@@ -94,22 +99,33 @@ public class AdminBusinessPanel extends JPanel {
         JPasswordField passwordField = new JPasswordField();
 
         JPanel form = buildForm(
-                new String[]{"Business Name", "Location", "Contact Info", "Username", "Email", "Password"},
-                new JComponent[]{nameField, locationField, contactField, usernameField, emailField, passwordField}
-        );
+                new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password" },
+                new JComponent[] { nameField, locationField, contactField, usernameField, emailField, passwordField });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
                 form,
                 "Register New Business",
                 JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
+                JOptionPane.PLAIN_MESSAGE);
 
+        // clean and validate
         if (result == JOptionPane.OK_OPTION) {
             try {
+                String name = nameField.getText().trim();
+                String location = locationField.getText().trim();
+                String contact = contactField.getText().trim();
                 String username = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(name, location, contact, username, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username uniqueness
                 if (businessDAO.getByUsername(username) != null) {
                     showError("Username already taken.");
                     return;
@@ -117,14 +133,14 @@ public class AdminBusinessPanel extends JPanel {
 
                 businessDAO.insert(new FoodBusiness(
                         0,
-                        nameField.getText().trim(),
-                        locationField.getText().trim(),
-                        contactField.getText().trim(),
+                        name,
+                        location,
+                        contact,
                         username,
-                        emailField.getText().trim(),
-                        new String(passwordField.getPassword())
-                ));
+                        email,
+                        password));
 
+                // link admin to this new business
                 int newId = businessDAO.getByUsername(username).getFoodBusinessId();
                 managesDAO.assignAdminToBusiness(adminId, newId);
 
@@ -137,11 +153,11 @@ public class AdminBusinessPanel extends JPanel {
         }
     }
 
-    // edit business
+    // edit existing business
     private void showEditBusinessDialog() {
         int row = businessTable.getSelectedRow();
 
-        if (row == -1) {
+        if (row == -1) { // if user didnt select a row
             showError("Please select a business to edit.");
             return;
         }
@@ -164,21 +180,32 @@ public class AdminBusinessPanel extends JPanel {
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
             JPanel form = buildForm(
-                    new String[]{"Business Name", "Location", "Contact Info", "Username", "Email", "Password"},
-                    new JComponent[]{nameField, locationField, contactField, usernameField, emailField, passwordField}
-            );
+                    new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password" },
+                    new JComponent[] { nameField, locationField, contactField, usernameField, emailField,
+                            passwordField });
 
             int result = JOptionPane.showConfirmDialog(
                     this,
                     form,
                     "Edit Business - " + existing.getName(),
                     JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE
-            );
+                    JOptionPane.PLAIN_MESSAGE);
 
             if (result == JOptionPane.OK_OPTION) {
+                String name = nameField.getText().trim();
+                String location = locationField.getText().trim();
+                String contact = contactField.getText().trim();
                 String newUsername = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(name, location, contact, newUsername, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username if changed
                 if (!newUsername.equals(existing.getUsername())) {
                     if (businessDAO.getByUsername(newUsername) != null) {
                         showError("Username already taken.");
@@ -186,12 +213,12 @@ public class AdminBusinessPanel extends JPanel {
                     }
                 }
 
-                existing.setName(nameField.getText().trim());
-                existing.setLocation(locationField.getText().trim());
-                existing.setContactInfo(contactField.getText().trim());
+                existing.setName(name);
+                existing.setLocation(location);
+                existing.setContactInfo(contact);
                 existing.setUsername(newUsername);
-                existing.setEmail(emailField.getText().trim());
-                existing.setPassword(new String(passwordField.getPassword()));
+                existing.setEmail(email);
+                existing.setPassword(password);
 
                 businessDAO.update(existing);
 
@@ -221,8 +248,7 @@ public class AdminBusinessPanel extends JPanel {
                 "Are you sure you want to delete business: " + name + "?",
                 "Confirm Delete",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
@@ -236,7 +262,7 @@ public class AdminBusinessPanel extends JPanel {
         }
     }
 
-    // build form
+    // build reusable form with name, loc, contact, username, email, pw
     private JPanel buildForm(String[] labels, JComponent[] fields) {
         JPanel form = new JPanel(new GridLayout(labels.length, 2, 10, 8));
         form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -247,6 +273,16 @@ public class AdminBusinessPanel extends JPanel {
         }
 
         return form;
+    }
+
+    // checks if any required field is blank
+    private boolean hasBlankFields(String... values) {
+        for (String value : values) {
+            if (value.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // show error

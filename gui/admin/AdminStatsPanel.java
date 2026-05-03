@@ -25,13 +25,15 @@ public class AdminStatsPanel extends JPanel {
     }
 
     private void buildPanel() {
-        //orders per customer
+        // orders per customer
         JLabel orderCountLabel = new JLabel("Total Orders Per Customer");
         orderCountLabel.setFont(new Font("Arial", Font.BOLD, 13));
 
-        String[] orderCountCols = {"Customer Name", "Total Orders"};
+        String[] orderCountCols = { "Customer Name", "Total Orders" };
         orderCountModel = new DefaultTableModel(orderCountCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         JTable orderCountTable = new JTable(orderCountModel);
         orderCountTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -40,13 +42,15 @@ public class AdminStatsPanel extends JPanel {
         orderCountPanel.add(orderCountLabel, BorderLayout.NORTH);
         orderCountPanel.add(new JScrollPane(orderCountTable), BorderLayout.CENTER);
 
-        //business revenue stuff
+        // business revenue stuff
         JLabel revenueLabel = new JLabel("Total Revenue Per Business (Delivered Orders, Highest First)");
         revenueLabel.setFont(new Font("Arial", Font.BOLD, 13));
 
-        String[] revenueCols = {"Business Name", "Total Revenue ($)"};
+        String[] revenueCols = { "Business Name", "Total Revenue ($)" };
         revenueModel = new DefaultTableModel(revenueCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         JTable revenueTable = new JTable(revenueModel);
         revenueTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -55,13 +59,15 @@ public class AdminStatsPanel extends JPanel {
         revenuePanel.add(revenueLabel, BorderLayout.NORTH);
         revenuePanel.add(new JScrollPane(revenueTable), BorderLayout.CENTER);
 
-        //avg order value per business
+        // avg order value per business
         JLabel avgLabel = new JLabel("Average Order Value Per Business");
         avgLabel.setFont(new Font("Arial", Font.BOLD, 13));
 
-        String[] avgCols = {"Business Name", "Avg Order Value ($)"};
+        String[] avgCols = { "Business Name", "Avg Order Value ($)" };
         avgModel = new DefaultTableModel(avgCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         JTable avgTable = new JTable(avgModel);
         avgTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -70,13 +76,15 @@ public class AdminStatsPanel extends JPanel {
         avgPanel.add(avgLabel, BorderLayout.NORTH);
         avgPanel.add(new JScrollPane(avgTable), BorderLayout.CENTER);
 
-        //deliveries made per driver
+        // deliveries made per driver
         JLabel deliveryCountLabel = new JLabel("Total Deliveries Per Driver");
         deliveryCountLabel.setFont(new Font("Arial", Font.BOLD, 13));
 
-        String[] deliveryCountCols = {"Driver Name", "Total Deliveries"};
+        String[] deliveryCountCols = { "Driver Name", "Total Deliveries" };
         deliveryCountModel = new DefaultTableModel(deliveryCountCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         JTable deliveryCountTable = new JTable(deliveryCountModel);
         deliveryCountTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -85,22 +93,24 @@ public class AdminStatsPanel extends JPanel {
         deliveryCountPanel.add(deliveryCountLabel, BorderLayout.NORTH);
         deliveryCountPanel.add(new JScrollPane(deliveryCountTable), BorderLayout.CENTER);
 
-        //total menu items per business
+        // total menu items per business
         JLabel menuItemCountLabel = new JLabel("Total Menu Items Per Business");
         menuItemCountLabel.setFont(new Font("Arial", Font.BOLD, 13));
 
-        String[] menuItemCountCols = {"Business Name", "Total Menu Items"};
+        String[] menuItemCountCols = { "Business Name", "Total Menu Items" };
         menuItemCountModel = new DefaultTableModel(menuItemCountCols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         JTable menuItemCountTable = new JTable(menuItemCountModel);
         menuItemCountTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JPanel menuItemCountPanel = new JPanel(new BorderLayout(5, 5));
-        menuItemCountPanel.add(menuItemCountLabel,                  BorderLayout.NORTH);
+        menuItemCountPanel.add(menuItemCountLabel, BorderLayout.NORTH);
         menuItemCountPanel.add(new JScrollPane(menuItemCountTable), BorderLayout.CENTER);
 
-        //putting the tables in a grid
+        // putting the tables in a grid
         JPanel tablesPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         tablesPanel.add(orderCountPanel);
         tablesPanel.add(revenuePanel);
@@ -126,15 +136,15 @@ public class AdminStatsPanel extends JPanel {
         loadMenuItemCounts();
     }
 
-    //load the amount of orders each customer has made
+    // load the amount of orders each customer has made
     private void loadOrderCounts() {
         orderCountModel.setRowCount(0);
         try {
             ResultSet rs = orderDAO.getOrderCountPerCustomer();
             while (rs.next()) {
-                orderCountModel.addRow(new Object[]{
-                    rs.getString("customer_name"),
-                    rs.getInt("total_orders")
+                orderCountModel.addRow(new Object[] {
+                        rs.getString("customer_name"),
+                        rs.getInt("total_orders")
                 });
             }
         } catch (SQLException e) {
@@ -142,15 +152,15 @@ public class AdminStatsPanel extends JPanel {
         }
     }
 
-    //load revenue per business
+    // load revenue per business
     private void loadRevenue() {
         revenueModel.setRowCount(0);
         try {
             ResultSet rs = orderDAO.getRevenuePerBusiness();
             while (rs.next()) {
-                revenueModel.addRow(new Object[]{
-                    rs.getString("business_name"),
-                    rs.getDouble("total_revenue")
+                revenueModel.addRow(new Object[] {
+                        rs.getString("business_name"),
+                        rs.getDouble("total_revenue")
                 });
             }
         } catch (SQLException e) {
@@ -158,15 +168,15 @@ public class AdminStatsPanel extends JPanel {
         }
     }
 
-    //load average order values (hard to tell by the function name, right?)
+    // load average order values (hard to tell by the function name, right?)
     private void loadAvgOrderValues() {
         avgModel.setRowCount(0);
         try {
             ResultSet rs = orderDAO.getAvgOrderValuePerBusiness();
             while (rs.next()) {
-                avgModel.addRow(new Object[]{
-                    rs.getString("business_name"),
-                    rs.getDouble("avg_order_value")
+                avgModel.addRow(new Object[] {
+                        rs.getString("business_name"),
+                        rs.getDouble("avg_order_value")
                 });
             }
         } catch (SQLException e) {
@@ -174,15 +184,15 @@ public class AdminStatsPanel extends JPanel {
         }
     }
 
-    //load deliveries per driver
+    // load deliveries per driver
     private void loadDeliveryCounts() {
         deliveryCountModel.setRowCount(0);
         try {
             ResultSet rs = orderDAO.getDeliveryCountPerDriver();
             while (rs.next()) {
-                deliveryCountModel.addRow(new Object[]{
-                    rs.getString("driver_name"),
-                    rs.getInt("total_deliveries")
+                deliveryCountModel.addRow(new Object[] {
+                        rs.getString("driver_name"),
+                        rs.getInt("total_deliveries")
                 });
             }
         } catch (SQLException e) {
@@ -190,15 +200,15 @@ public class AdminStatsPanel extends JPanel {
         }
     }
 
-    //load total menu items per business
+    // load total menu items per business
     private void loadMenuItemCounts() {
         menuItemCountModel.setRowCount(0);
         try {
             ResultSet rs = orderDAO.getMenuItemCountPerBusiness();
             while (rs.next()) {
-                menuItemCountModel.addRow(new Object[]{
-                    rs.getString("business_name"),
-                    rs.getInt("total_items")
+                menuItemCountModel.addRow(new Object[] {
+                        rs.getString("business_name"),
+                        rs.getInt("total_items")
                 });
             }
         } catch (SQLException e) {

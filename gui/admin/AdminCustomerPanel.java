@@ -10,9 +10,10 @@ import java.awt.*;
 import java.sql.SQLException;
 
 public class AdminCustomerPanel extends JPanel {
-
+    // the admin will manage customers through this panel
     private int adminId;
 
+    // data access objects
     private CustomerDAO customerDAO = new CustomerDAO();
     private AdminManagesDAO managesDAO = new AdminManagesDAO();
 
@@ -29,9 +30,9 @@ public class AdminCustomerPanel extends JPanel {
         loadCustomers();
     }
 
-    // build panel
+    // build panel, table, buttons
     private void buildPanel() {
-        String[] cols = {"ID", "First Name", "Last Name", "Address", "Contact", "Username", "Email"};
+        String[] cols = { "ID", "First Name", "Last Name", "Address", "Contact", "Username", "Email" };
 
         customerModel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) {
@@ -39,9 +40,11 @@ public class AdminCustomerPanel extends JPanel {
             }
         };
 
+        // table
         customerTable = new JTable(customerModel);
         customerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        // buttons
         JButton registerButton = new JButton("Register Customer");
         JButton editButton = new JButton("Edit Selected");
         JButton deleteButton = new JButton("Delete Selected");
@@ -63,13 +66,13 @@ public class AdminCustomerPanel extends JPanel {
         refreshButton.addActionListener(e -> loadCustomers());
     }
 
-    // load customers
+    // get the customer accounts
     private void loadCustomers() {
         customerModel.setRowCount(0);
 
         try {
             for (Customer customer : customerDAO.getAll()) {
-                customerModel.addRow(new Object[]{
+                customerModel.addRow(new Object[] {
                         customer.getCustomerId(),
                         customer.getFirstName(),
                         customer.getLastName(),
@@ -85,7 +88,7 @@ public class AdminCustomerPanel extends JPanel {
         }
     }
 
-    // register customer
+    // register new customers
     private void showRegisterCustomerDialog() {
         JTextField firstNameField = new JTextField();
         JTextField lastNameField = new JTextField();
@@ -96,38 +99,52 @@ public class AdminCustomerPanel extends JPanel {
         JPasswordField passwordField = new JPasswordField();
 
         JPanel form = buildForm(
-                new String[]{"First Name", "Last Name", "Address", "Contact Info", "Username", "Email", "Password"},
-                new JComponent[]{firstNameField, lastNameField, addressField, contactField, usernameField, emailField, passwordField}
-        );
+                new String[] { "First Name", "Last Name", "Address", "Contact Info", "Username", "Email", "Password" },
+                new JComponent[] { firstNameField, lastNameField, addressField, contactField, usernameField, emailField,
+                        passwordField });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
                 form,
                 "Register New Customer",
                 JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
+                JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
             try {
+                // clean inputs
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String address = addressField.getText().trim();
+                String contact = contactField.getText().trim();
                 String username = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(firstName, lastName, address, contact, username, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username uniqueness
                 if (customerDAO.getByUsername(username) != null) {
                     showError("Username already taken.");
                     return;
                 }
 
+                // insert new customer
                 customerDAO.insert(new Customer(
                         0,
-                        firstNameField.getText().trim(),
-                        lastNameField.getText().trim(),
-                        addressField.getText().trim(),
-                        contactField.getText().trim(),
+                        firstName,
+                        lastName,
+                        address,
+                        contact,
                         username,
-                        emailField.getText().trim(),
-                        new String(passwordField.getPassword())
-                ));
+                        email,
+                        password));
 
+                // link admin to this new customer
                 int newId = customerDAO.getByUsername(username).getCustomerId();
                 managesDAO.assignAdminToCustomer(adminId, newId);
 
@@ -140,7 +157,7 @@ public class AdminCustomerPanel extends JPanel {
         }
     }
 
-    // edit customer
+    // edit existing customer
     private void showEditCustomerDialog() {
         int row = customerTable.getSelectedRow();
 
@@ -168,21 +185,35 @@ public class AdminCustomerPanel extends JPanel {
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
             JPanel form = buildForm(
-                    new String[]{"First Name", "Last Name", "Address", "Contact Info", "Username", "Email", "Password"},
-                    new JComponent[]{firstNameField, lastNameField, addressField, contactField, usernameField, emailField, passwordField}
-            );
+                    new String[] { "First Name", "Last Name", "Address", "Contact Info", "Username", "Email",
+                            "Password" },
+                    new JComponent[] { firstNameField, lastNameField, addressField, contactField, usernameField,
+                            emailField, passwordField });
 
             int result = JOptionPane.showConfirmDialog(
                     this,
                     form,
                     "Edit Customer - " + existing.getFullName(),
                     JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE
-            );
+                    JOptionPane.PLAIN_MESSAGE);
 
+            // clean and validate updated fields
             if (result == JOptionPane.OK_OPTION) {
+                String firstName = firstNameField.getText().trim();
+                String lastName = lastNameField.getText().trim();
+                String address = addressField.getText().trim();
+                String contact = contactField.getText().trim();
                 String newUsername = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword());
 
+                // check required fields
+                if (hasBlankFields(firstName, lastName, address, contact, newUsername, email, password)) {
+                    showError("Please fill required fields.");
+                    return;
+                }
+
+                // check username if changed
                 if (!newUsername.equals(existing.getUsername())) {
                     if (customerDAO.getByUsername(newUsername) != null) {
                         showError("Username already taken.");
@@ -190,13 +221,14 @@ public class AdminCustomerPanel extends JPanel {
                     }
                 }
 
-                existing.setFirstName(firstNameField.getText().trim());
-                existing.setLastName(lastNameField.getText().trim());
-                existing.setAddress(addressField.getText().trim());
-                existing.setContactInfo(contactField.getText().trim());
+                // update fields
+                existing.setFirstName(firstName);
+                existing.setLastName(lastName);
+                existing.setAddress(address);
+                existing.setContactInfo(contact);
                 existing.setUsername(newUsername);
-                existing.setEmail(emailField.getText().trim());
-                existing.setPassword(new String(passwordField.getPassword()));
+                existing.setEmail(email);
+                existing.setPassword(password);
 
                 customerDAO.update(existing);
 
@@ -226,8 +258,7 @@ public class AdminCustomerPanel extends JPanel {
                 "Are you sure you want to delete customer: " + name + "?",
                 "Confirm Delete",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
+                JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
@@ -252,6 +283,16 @@ public class AdminCustomerPanel extends JPanel {
         }
 
         return form;
+    }
+
+    // checks if any required field is blank
+    private boolean hasBlankFields(String... values) {
+        for (String value : values) {
+            if (value.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // show error
