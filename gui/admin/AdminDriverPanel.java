@@ -3,6 +3,7 @@ package gui.admin;
 import dao.AdminManagesDAO;
 import dao.DeliveryPersonnelDAO;
 import model.DeliveryPersonnel;
+import javax.swing.text.MaskFormatter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -92,17 +93,45 @@ public class AdminDriverPanel extends JPanel {
     private void showRegisterDeliveryDialog() {
         JTextField firstNameField = new JTextField();
         JTextField lastNameField = new JTextField();
-        JTextField contactField = new JTextField();
+
+        // JTextField contactField = new JTextField();
+        // phone number
+        JFormattedTextField contactField = new JFormattedTextField();
+
+        // phone format mask
+        try {
+            MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+            phoneFormatter.setPlaceholderCharacter('_');
+            phoneFormatter.install(contactField);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // phone field
+        contactField.setColumns(10);
+        contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+        contactField.setHorizontalAlignment(JTextField.CENTER);
+
         JTextField vehicleField = new JTextField();
         JTextField usernameField = new JTextField();
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
+        // show password
+        JCheckBox showPasswordBox = new JCheckBox("Show Password");
+        char defaultEchoChar = passwordField.getEchoChar();
 
+        showPasswordBox.addActionListener(e -> {
+            if (showPasswordBox.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar(defaultEchoChar);
+            }
+        });
         JPanel form = buildForm(
                 new String[] { "First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email",
-                        "Password" },
+                        "Password", "" },
                 new JComponent[] { firstNameField, lastNameField, contactField, vehicleField, usernameField, emailField,
-                        passwordField });
+                        passwordField, showPasswordBox });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -116,7 +145,7 @@ public class AdminDriverPanel extends JPanel {
             try {
                 String firstName = firstNameField.getText().trim();
                 String lastName = lastNameField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String vehicle = vehicleField.getText().trim();
                 String username = usernameField.getText().trim();
                 String email = emailField.getText().trim();
@@ -178,17 +207,49 @@ public class AdminDriverPanel extends JPanel {
 
             JTextField firstNameField = new JTextField(existing.getFirstName());
             JTextField lastNameField = new JTextField(existing.getLastName());
-            JTextField contactField = new JTextField(existing.getContactInfo());
+
+            // JTextField contactField = new JTextField(existing.getContactInfo());
+            // phone number
+            JFormattedTextField contactField = new JFormattedTextField();
+
+            // phone format mask
+            try {
+                MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+                phoneFormatter.setPlaceholderCharacter('_');
+                phoneFormatter.install(contactField);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            // phone field
+            contactField.setColumns(10);
+            contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+            contactField.setHorizontalAlignment(JTextField.CENTER);
+
+            contactField.setText(existing.getContactInfo());
+
             JTextField vehicleField = new JTextField(existing.getVehicleDetails());
             JTextField usernameField = new JTextField(existing.getUsername());
             JTextField emailField = new JTextField(existing.getEmail());
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
+            // show password
+            JCheckBox showPasswordBox = new JCheckBox("Show Password");
+            char defaultEchoChar = passwordField.getEchoChar();
+
+            showPasswordBox.addActionListener(e -> {
+                if (showPasswordBox.isSelected()) {
+                    passwordField.setEchoChar((char) 0);
+                } else {
+                    passwordField.setEchoChar(defaultEchoChar);
+                }
+            });
+
             JPanel form = buildForm(
                     new String[] { "First Name", "Last Name", "Contact Info", "Vehicle Details", "Username", "Email",
-                            "Password" },
+                            "Password", "" },
                     new JComponent[] { firstNameField, lastNameField, contactField, vehicleField, usernameField,
-                            emailField, passwordField });
+                            emailField, passwordField, showPasswordBox });
 
             int result = JOptionPane.showConfirmDialog(
                     this,
@@ -201,7 +262,7 @@ public class AdminDriverPanel extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 String firstName = firstNameField.getText().trim();
                 String lastName = lastNameField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String vehicle = vehicleField.getText().trim();
                 String newUsername = usernameField.getText().trim();
                 String email = emailField.getText().trim();

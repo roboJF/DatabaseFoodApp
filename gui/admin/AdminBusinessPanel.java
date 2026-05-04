@@ -3,6 +3,7 @@ package gui.admin;
 import dao.AdminManagesDAO;
 import dao.FoodBusinessDAO;
 import model.FoodBusiness;
+import javax.swing.text.MaskFormatter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -93,14 +94,45 @@ public class AdminBusinessPanel extends JPanel {
     private void showRegisterBusinessDialog() {
         JTextField nameField = new JTextField();
         JTextField locationField = new JTextField();
-        JTextField contactField = new JTextField();
+        // JTextField contactField = new JTextField();
+
+        // phone number
+        JFormattedTextField contactField = new JFormattedTextField();
+
+        // phone format mask
+        try {
+            MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+            phoneFormatter.setPlaceholderCharacter('_');
+            phoneFormatter.install(contactField);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // phone field
+        contactField.setColumns(10);
+        contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+        contactField.setHorizontalAlignment(JTextField.CENTER);
+
         JTextField usernameField = new JTextField();
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
 
+        // show password
+        JCheckBox showPasswordBox = new JCheckBox("Show Password");
+        char defaultEchoChar = passwordField.getEchoChar();
+
+        showPasswordBox.addActionListener(e -> {
+            if (showPasswordBox.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar(defaultEchoChar);
+            }
+        });
+
         JPanel form = buildForm(
-                new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password" },
-                new JComponent[] { nameField, locationField, contactField, usernameField, emailField, passwordField });
+                new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password", "" },
+                new JComponent[] { nameField, locationField, contactField, usernameField, emailField, passwordField,
+                        showPasswordBox });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -114,7 +146,7 @@ public class AdminBusinessPanel extends JPanel {
             try {
                 String name = nameField.getText().trim();
                 String location = locationField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String username = usernameField.getText().trim();
                 String email = emailField.getText().trim();
                 String password = new String(passwordField.getPassword());
@@ -174,16 +206,47 @@ public class AdminBusinessPanel extends JPanel {
 
             JTextField nameField = new JTextField(existing.getName());
             JTextField locationField = new JTextField(existing.getLocation());
-            JTextField contactField = new JTextField(existing.getContactInfo());
+            // JTextField contactField = new JTextField(existing.getContactInfo());
+
+            // phone number
+            JFormattedTextField contactField = new JFormattedTextField();
+
+            // phone format mask
+            try {
+                MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+                phoneFormatter.setPlaceholderCharacter('_');
+                phoneFormatter.install(contactField);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            // phone field
+            contactField.setColumns(10);
+            contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+            contactField.setHorizontalAlignment(JTextField.CENTER);
+
+            contactField.setText(existing.getContactInfo());
+
             JTextField usernameField = new JTextField(existing.getUsername());
             JTextField emailField = new JTextField(existing.getEmail());
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
-            JPanel form = buildForm(
-                    new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password" },
-                    new JComponent[] { nameField, locationField, contactField, usernameField, emailField,
-                            passwordField });
+            // show password
+            JCheckBox showPasswordBox = new JCheckBox("Show Password");
+            char defaultEchoChar = passwordField.getEchoChar();
 
+            showPasswordBox.addActionListener(e -> {
+                if (showPasswordBox.isSelected()) {
+                    passwordField.setEchoChar((char) 0);
+                } else {
+                    passwordField.setEchoChar(defaultEchoChar);
+                }
+            });
+
+            JPanel form = buildForm(
+                    new String[] { "Business Name", "Location", "Contact Info", "Username", "Email", "Password", "" },
+                    new JComponent[] { nameField, locationField, contactField, usernameField, emailField, passwordField,
+                            showPasswordBox });
             int result = JOptionPane.showConfirmDialog(
                     this,
                     form,
@@ -194,7 +257,7 @@ public class AdminBusinessPanel extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 String name = nameField.getText().trim();
                 String location = locationField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String newUsername = usernameField.getText().trim();
                 String email = emailField.getText().trim();
                 String password = new String(passwordField.getPassword());

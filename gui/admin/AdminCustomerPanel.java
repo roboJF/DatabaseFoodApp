@@ -3,6 +3,7 @@ package gui.admin;
 import dao.AdminManagesDAO;
 import dao.CustomerDAO;
 import model.Customer;
+import javax.swing.text.MaskFormatter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -93,15 +94,45 @@ public class AdminCustomerPanel extends JPanel {
         JTextField firstNameField = new JTextField();
         JTextField lastNameField = new JTextField();
         JTextField addressField = new JTextField();
-        JTextField contactField = new JTextField();
+
+        // JTextField contactField = new JTextField();
+        // phone number
+        JFormattedTextField contactField = new JFormattedTextField();
+
+        // phone format mask
+        try {
+            MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+            phoneFormatter.setPlaceholderCharacter('_');
+            phoneFormatter.install(contactField);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // phone field
+        contactField.setColumns(10);
+        contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+        contactField.setHorizontalAlignment(JTextField.CENTER);
+
         JTextField usernameField = new JTextField();
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
+        // show password
+        JCheckBox showPasswordBox = new JCheckBox("Show Password");
+        char defaultEchoChar = passwordField.getEchoChar();
+
+        showPasswordBox.addActionListener(e -> {
+            if (showPasswordBox.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar(defaultEchoChar);
+            }
+        });
 
         JPanel form = buildForm(
-                new String[] { "First Name", "Last Name", "Address", "Contact Info", "Username", "Email", "Password" },
+                new String[] { "First Name", "Last Name", "Address", "Contact Info", "Username", "Email", "Password",
+                        "" },
                 new JComponent[] { firstNameField, lastNameField, addressField, contactField, usernameField, emailField,
-                        passwordField });
+                        passwordField, showPasswordBox });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -116,7 +147,7 @@ public class AdminCustomerPanel extends JPanel {
                 String firstName = firstNameField.getText().trim();
                 String lastName = lastNameField.getText().trim();
                 String address = addressField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String username = usernameField.getText().trim();
                 String email = emailField.getText().trim();
                 String password = new String(passwordField.getPassword());
@@ -179,16 +210,48 @@ public class AdminCustomerPanel extends JPanel {
             JTextField firstNameField = new JTextField(existing.getFirstName());
             JTextField lastNameField = new JTextField(existing.getLastName());
             JTextField addressField = new JTextField(existing.getAddress());
-            JTextField contactField = new JTextField(existing.getContactInfo());
+
+            // JTextField contactField = new JTextField(existing.getContactInfo());
+            // phone number
+            JFormattedTextField contactField = new JFormattedTextField();
+
+            // phone format mask
+            try {
+                MaskFormatter phoneFormatter = new MaskFormatter("###-###-####");
+                phoneFormatter.setPlaceholderCharacter('_');
+                phoneFormatter.install(contactField);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            // phone field
+            contactField.setColumns(10);
+            contactField.setPreferredSize(new Dimension(120, contactField.getPreferredSize().height));
+            contactField.setHorizontalAlignment(JTextField.CENTER);
+
+            contactField.setText(existing.getContactInfo());
+
             JTextField usernameField = new JTextField(existing.getUsername());
             JTextField emailField = new JTextField(existing.getEmail());
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
+            // show password
+            JCheckBox showPasswordBox = new JCheckBox("Show Password");
+            char defaultEchoChar = passwordField.getEchoChar();
+
+            showPasswordBox.addActionListener(e -> {
+                if (showPasswordBox.isSelected()) {
+                    passwordField.setEchoChar((char) 0);
+                } else {
+                    passwordField.setEchoChar(defaultEchoChar);
+                }
+            });
+
             JPanel form = buildForm(
                     new String[] { "First Name", "Last Name", "Address", "Contact Info", "Username", "Email",
-                            "Password" },
+                            "Password", "" },
                     new JComponent[] { firstNameField, lastNameField, addressField, contactField, usernameField,
-                            emailField, passwordField });
+                            emailField, passwordField, showPasswordBox });
 
             int result = JOptionPane.showConfirmDialog(
                     this,
@@ -202,7 +265,7 @@ public class AdminCustomerPanel extends JPanel {
                 String firstName = firstNameField.getText().trim();
                 String lastName = lastNameField.getText().trim();
                 String address = addressField.getText().trim();
-                String contact = contactField.getText().trim();
+                String contact = contactField.getText().replaceAll("[^0-9]", "");
                 String newUsername = usernameField.getText().trim();
                 String email = emailField.getText().trim();
                 String password = new String(passwordField.getPassword());

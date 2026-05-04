@@ -88,9 +88,21 @@ public class AdminAdminPanel extends JPanel {
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
 
+        // show password
+        JCheckBox showPasswordBox = new JCheckBox("Show Password");
+        char defaultEchoChar = passwordField.getEchoChar();
+
+        showPasswordBox.addActionListener(e -> {
+            if (showPasswordBox.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar(defaultEchoChar);
+            }
+        });
+
         JPanel form = buildForm(
-                new String[] { "Username", "Email", "Password" },
-                new JComponent[] { usernameField, emailField, passwordField });
+                new String[] { "Username", "Email", "Password", "" },
+                new JComponent[] { usernameField, emailField, passwordField, showPasswordBox });
 
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -152,9 +164,21 @@ public class AdminAdminPanel extends JPanel {
             JTextField emailField = new JTextField(existing.getEmail());
             JPasswordField passwordField = new JPasswordField(existing.getPassword());
 
+            // show password
+            JCheckBox showPasswordBox = new JCheckBox("Show Password");
+            char defaultEchoChar = passwordField.getEchoChar();
+
+            showPasswordBox.addActionListener(e -> {
+                if (showPasswordBox.isSelected()) {
+                    passwordField.setEchoChar((char) 0);
+                } else {
+                    passwordField.setEchoChar(defaultEchoChar);
+                }
+            });
+
             JPanel form = buildForm(
-                    new String[] { "Username", "Email", "Password" },
-                    new JComponent[] { usernameField, emailField, passwordField });
+                    new String[] { "Username", "Email", "Password", "" },
+                    new JComponent[] { usernameField, emailField, passwordField, showPasswordBox });
 
             // verify
             int result = JOptionPane.showConfirmDialog(
