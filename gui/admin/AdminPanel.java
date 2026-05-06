@@ -57,6 +57,7 @@ public class AdminPanel extends JPanel {
     private JTabbedPane buildTabs() {
         JTabbedPane tabs = new JTabbedPane();
 
+        tabs.addTab("Orders", new AdminOrdersPanel());
         tabs.addTab("Admins", new AdminAdminPanel(adminId));
         tabs.addTab("Customers", new AdminCustomerPanel(adminId));
         tabs.addTab("Food Businesses", new AdminBusinessPanel(adminId));

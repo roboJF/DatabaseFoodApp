@@ -65,12 +65,14 @@ public class RestaurantOrdersPanel extends JPanel {
         orderTable.getColumnModel().getColumn(7).setPreferredWidth(160); // Status
 
         // allow restaurant to set order status for customer and driver's view
+        JButton cancelButton = new JButton("Cancel Order");
         JButton pendingButton = new JButton("Mark Pending");
         JButton preparingButton = new JButton("Mark Preparing");
         JButton readyButton = new JButton("Mark Ready for Pickup");
         JButton refreshButton = new JButton("Refresh Orders");
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(cancelButton);
         buttonPanel.add(pendingButton);
         buttonPanel.add(preparingButton);
         buttonPanel.add(readyButton);
@@ -79,6 +81,7 @@ public class RestaurantOrdersPanel extends JPanel {
         add(new JScrollPane(orderTable), BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
+        cancelButton.addActionListener(e -> confirmCancelOrder());
         preparingButton.addActionListener(e -> updateSelectedOrderStatus("PREPARING"));
         pendingButton.addActionListener(e -> updateSelectedOrderStatus("PENDING"));
         readyButton.addActionListener(e -> updateSelectedOrderStatus("READY"));
@@ -121,6 +124,31 @@ public class RestaurantOrdersPanel extends JPanel {
         }
     }
 
+    // confirm before cancelling selected order
+    private void confirmCancelOrder() {
+        int row = orderTable.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Select an order first.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Do you want to cancel this order?",
+                "Confirm Cancel",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        updateSelectedOrderStatus("CANCELLED");
+    }
+
     // format the status string displayed to user
     private String formatStatus(String status) {
         if (status == null)
@@ -157,6 +185,29 @@ public class RestaurantOrdersPanel extends JPanel {
         FoodOrder selectedOrder = orderList.get(row);
         String currentStatus = selectedOrder.getOrderStatus();
 
+        // cancellation flow:
+        // PENDING -> CANCELLED
+
+        if (status.equals("CANCELLED")
+                && !currentStatus.equals("PENDING")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Only pending orders can be cancelled.");
+
+            return;
+        }
+
+        // cancelled orders cannot be modified
+
+        if (currentStatus.equals("CANCELLED")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This order has already been cancelled.");
+
+            return;
+        }
         // only allow changes if still in restaurant control
         // cant change after driver assigned
         if (!currentStatus.equals("PENDING")

@@ -62,3 +62,11 @@ SELECT * FROM menu_item;
 SELECT * FROM food_order;
 SELECT * FROM order_item;
 */
+-- SELECT 
+--     food_order_id,
+--     order_status,
+--     customer_id,
+--     food_business_id,
+--     delivery_personnel_id
+-- FROM food_order
+-- ORDER BY food_order_id;
