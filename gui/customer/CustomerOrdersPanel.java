@@ -127,6 +127,13 @@ public class CustomerOrdersPanel extends JPanel {
 
         String status = ordersModel.getValueAt(row, 2).toString();
 
+        if (status.equals("Cancelled")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This order has already been cancelled.");
+            return;
+        }
+
         if (!status.equals("Pending")) {
             JOptionPane.showMessageDialog(
                     this,

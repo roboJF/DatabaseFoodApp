@@ -187,25 +187,27 @@ public class RestaurantOrdersPanel extends JPanel {
 
         // cancellation flow:
         // PENDING -> CANCELLED
-
         if (status.equals("CANCELLED")
                 && !currentStatus.equals("PENDING")) {
-
             JOptionPane.showMessageDialog(
                     this,
                     "Only pending orders can be cancelled.");
-
             return;
         }
 
         // cancelled orders cannot be modified
-
         if (currentStatus.equals("CANCELLED")) {
-
             JOptionPane.showMessageDialog(
                     this,
                     "This order has already been cancelled.");
+            return;
+        }
 
+        // delivered orders cannot be modified
+        if (currentStatus.equals("DELIVERED")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Delivered orders cannot be modified.");
             return;
         }
         // only allow changes if still in restaurant control

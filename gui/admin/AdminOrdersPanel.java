@@ -156,6 +156,23 @@ public class AdminOrdersPanel extends JPanel {
         }
         FoodOrder selectedOrder = orderList.get(row);
         String currentStatus = selectedOrder.getOrderStatus();
+        // cancelled orders cannot be modified
+
+        if (currentStatus.equals("CANCELLED")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This order has already been cancelled.");
+            return;
+        }
+
+        // delivered orders cannot be modified
+        if (currentStatus.equals("DELIVERED")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Delivered orders cannot be modified.");
+            return;
+        }
+
         // cancellation flow:
         // PENDING -> CANCELLED
         if (status.equals("CANCELLED")
@@ -267,6 +284,20 @@ public class AdminOrdersPanel extends JPanel {
             return;
         }
         FoodOrder selectedOrder = orderList.get(row);
+        if (selectedOrder.getOrderStatus().equals("DELIVERED")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Delivered orders cannot be unassigned.");
+            return;
+        }
+
+        if (selectedOrder.getOrderStatus().equals("CANCELLED")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Cancelled orders cannot be unassigned.");
+            return;
+        }
+
         if (!selectedOrder.getOrderStatus().equals("ASSIGNED")) {
             JOptionPane.showMessageDialog(
                     this,
