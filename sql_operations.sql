@@ -1,127 +1,71 @@
-USE food_delivery;
+-- select queries
+SELECT * FROM food_business WHERE food_business_id = 1;
 
--- =========================
--- SELECT (2)
--- =========================
-
--- 1. Show all customers
 SELECT * FROM customer;
 
--- 2. Show all menu items
-SELECT * FROM menu_item;
+-- join queries
+SELECT mi.*, oi.quantity FROM menu_item mi 
+JOIN order_item oi ON mi.menu_item_id = oi.menu_item_id 
+WHERE oi.food_order_id = 1;
 
--- =========================
--- WHERE (Filtering) (2)
--- =========================
+SELECT mi.name, oi.quantity 
+FROM order_item oi 
+JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id 
+WHERE oi.food_order_id = 2; 
 
--- 1. Show only the PENDING orders
-SELECT *
-FROM food_order
-WHERE order_status = 'PENDING';
+-- update queries
+UPDATE customer  
+SET first_name = 'someone', last_name = 'cool', address = '159 cool st', contact_info = '1236547809', username = 'customer3', email = 'cool@cool.com', password = 'password'  
+WHERE customer_id = 3; 
 
--- 2. Show menu items that cost more than $6.00
-SELECT *
-FROM menu_item
-WHERE price > 6.00;
+UPDATE delivery_personnel
+SET first_name = 'someone', last_name = 'cooler', contact_info = '1236547809', vehicle_details = 'legs' , username = 'driver3', email = 'cool@cooler.com', password = 'password'
+WHERE delivery_personnel_id = 3;
 
+-- delete queries
+DELETE oi FROM order_item oi
+JOIN food_order fo ON oi.food_order_id = fo.food_order_id
+WHERE fo.customer_id = 1;
+DELETE FROM food_order WHERE customer_id = 1;
+DELETE FROM admin_manages_customer WHERE customer_id = 1;
+DELETE FROM customer WHERE customer_id = 1;
 
--- =========================
--- JOIN (2)
--- =========================
-
--- 1. Orders with customer names
-SELECT 
-    fo.food_order_id,
-    c.first_name,
-    c.last_name,
-    fo.order_status
-FROM food_order fo
-JOIN customer c ON fo.customer_id = c.customer_id;
-
--- 2. Orders with restaurant names
-SELECT 
-    fo.food_order_id,
-    fb.name AS restaurant,
-    fo.order_status
-FROM food_order fo
-JOIN food_business fb ON fo.food_business_id = fb.food_business_id;
-
-
--- =========================
--- ORDER BY (2)
--- =========================
-
--- 1. Menu items from cheapest to most expensive
-SELECT *
-FROM menu_item
-ORDER BY price ASC;
-
--- 2. Customers sorted by last name
-SELECT *
-FROM customer
-ORDER BY last_name;
-
-
--- =========================
--- GROUP BY (2)
--- =========================
-
--- 1. Count orders per status
-SELECT 
-    order_status,
-    COUNT(*) AS total
-FROM food_order
-GROUP BY order_status;
-
--- 2. Count menu items per business
-SELECT 
-    food_business_id,
-    COUNT(*) AS total_items
-FROM menu_item
-GROUP BY food_business_id;
-
-
--- =========================
--- UPDATE (2)
--- =========================
-
--- 1. Assign delivery person to order 1
 UPDATE food_order
-SET delivery_personnel_id = 1,
-    order_status = 'ASSIGNED'
-WHERE food_order_id = 1;
+SET 
+	delivery_personnel_id = NULL,
+	order_status = CASE 
+		WHEN order_status = 'DELIVERED' THEN order_status
+		ELSE 'READY'
+END
+WHERE delivery_personnel_id = 1;
+DELETE FROM admin_manages_delivery WHERE delivery_personnel_id = 1;
+DELETE FROM delivery_personnel WHERE delivery_personnel_id = 1;
 
--- Show result
-SELECT * FROM food_order WHERE food_order_id = 1;
+-- group by queries
+SELECT CONCAT(dp.first_name, ' ', dp.last_name) AS driver_name, 
+COUNT(fo.food_order_id) AS total_deliveries 
+FROM delivery_personnel dp 
+LEFT JOIN food_order fo ON dp.delivery_personnel_id = fo.delivery_personnel_id 
+GROUP BY dp.delivery_personnel_id, dp.first_name, dp.last_name; 
 
--- 2. Change price of a menu item
-UPDATE menu_item
-SET price = 6.49
-WHERE menu_item_id = 1;
+SELECT fb.name AS business_name,
+COUNT(mi.menu_item_id) AS total_items
+FROM food_business fb
+LEFT JOIN menu_item mi ON fb.food_business_id = mi.food_business_id
+GROUP BY fb.food_business_id, fb.name;
 
--- Show result
-SELECT * FROM menu_item WHERE menu_item_id = 1;
+-- order by query
+SELECT fb.name AS business_name,
+SUM(mi.price * oi.quantity) AS total_revenue
+FROM food_business fb
+JOIN food_order fo ON fb.food_business_id = fo.food_business_id
+JOIN order_item oi ON fo.food_order_id = oi.food_order_id
+JOIN menu_item mi ON oi.menu_item_id = mi.menu_item_id
+WHERE fo.order_status = 'DELIVERED'
+GROUP BY fb.food_business_id, fb.name
+ORDER BY total_revenue DESC;
 
+-- where queries
+SELECT * FROM customer WHERE username = 'suep'; 
 
--- =========================
--- DELETE (2)
--- =========================
-
--- 1. Delete one order item
-DELETE FROM order_item
-WHERE order_item_id = 1;
-
--- Show result
-SELECT * FROM order_item;
-
--- DELETE example 2: insert then delete a temporary menu item (had a few errors so had to be smart)
--- Did not want to use SET SQL_SAFE_UPDATES = 0; because of safety
-INSERT INTO menu_item (name, description, price, availability, food_business_id)
-VALUES ('Test Item', 'Temporary item for delete example', 1.99, TRUE, 1);
-
-SELECT * FROM menu_item;
-
-DELETE FROM menu_item
-WHERE menu_item_id = 10;
-
-SELECT * FROM menu_item;
+SELECT * FROM food_order WHERE customer_id = 1; 

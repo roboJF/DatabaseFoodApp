@@ -11,7 +11,7 @@
 
 # MySQL Connector (JARs)
 lib/
-*.jar
+
 
 # OS junk
 .DS_Store
